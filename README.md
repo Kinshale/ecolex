@@ -1,5 +1,7 @@
 # Welcome to your Lovable project
 
+This is a change made locally. Testing connection.
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
