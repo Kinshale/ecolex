@@ -9,6 +9,7 @@ export default function DocumentAnalysis() {
   const [filters, setFilters] = useState<FilterState>({
     regulatoryScopes: ['european', 'national', 'lombardy'] as RegulatoryScope[],
     areaOfInterest: null,
+    selectedNorms: [],
   });
 
   return (

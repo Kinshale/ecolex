@@ -10,9 +10,16 @@ export type AreaOfInterest =
   | 'energy' 
   | 'general';
 
+export interface NormItem {
+  id: string;
+  name: string;
+  url: string;
+}
+
 export interface FilterState {
   regulatoryScopes: RegulatoryScope[];
   areaOfInterest: AreaOfInterest | null;
+  selectedNorms: string[];
 }
 
 export interface ChatMessage {
