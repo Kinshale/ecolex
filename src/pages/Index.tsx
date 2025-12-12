@@ -1,18 +1,9 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import Dashboard from './Dashboard';
 import { Loader2 } from 'lucide-react';
 
 export default function Index() {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
+  const { loading } = useAuth();
 
   if (loading) {
     return (
@@ -25,9 +16,6 @@ export default function Index() {
     );
   }
 
-  if (!user) {
-    return null;
-  }
-
+  // Dashboard is now accessible to both guests and authenticated users
   return <Dashboard />;
 }
