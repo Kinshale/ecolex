@@ -81,24 +81,7 @@ export default function Dashboard() {
         </section>
 
         {/* Stats Section */}
-        <section className="py-12 px-6 md:px-8 lg:px-12">
-          <div className="max-w-3xl mx-auto">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-6 rounded-xl bg-muted/50">
-                <p className="text-3xl font-bold text-foreground">3</p>
-                <p className="text-sm text-muted-foreground">Regulatory Levels</p>
-              </div>
-              <div className="p-6 rounded-xl bg-muted/50">
-                <p className="text-3xl font-bold text-foreground">50+</p>
-                <p className="text-sm text-muted-foreground">Legal Norms</p>
-              </div>
-              <div className="p-6 rounded-xl bg-muted/50">
-                <p className="text-3xl font-bold text-foreground">AI</p>
-                <p className="text-sm text-muted-foreground">Powered Analysis</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        
       </main>
 
       {/* Footer */}
