@@ -6,6 +6,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import type { CourseConfig } from '@/pages/PolimiHub';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 interface Message {
   id: string;
@@ -291,10 +295,21 @@ function MessageBubble({ message }: { message: Message }) {
           'max-w-[85%] rounded-2xl px-4 py-3',
           isUser 
             ? 'bg-primary text-primary-foreground rounded-br-md' 
-            : 'bg-muted text-foreground rounded-bl-md'
+            : 'bg-muted text-foreground rounded-bl-md prose prose-sm dark:prose-invert max-w-none'
         )}
       >
-        <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+        {isUser ? (
+          <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+        ) : (
+          <div className="text-sm leading-relaxed [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&>p:last-child]:mb-0">
+            <ReactMarkdown
+              remarkPlugins={[remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+            >
+              {message.content}
+            </ReactMarkdown>
+          </div>
+        )}
       </div>
     </div>
   );
