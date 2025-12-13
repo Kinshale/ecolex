@@ -1,73 +1,141 @@
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { FeatureCard } from '@/components/FeatureCard';
-import { Search, FileCheck, GraduationCap, Leaf } from 'lucide-react';
+import { Search, FileCheck, GraduationCap, Leaf, Shield, Zap } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+
+  const handleFeatureClick = () => {
+    // All features require authentication - redirect to auth
+    navigate('/auth');
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       
-      <main className="flex-1 flex flex-col items-center justify-center p-6 md:p-8 lg:p-12">
-        <div className="max-w-4xl w-full mx-auto">
-          {/* Hero Section */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+      <main className="flex-1 flex flex-col">
+        {/* Hero Section */}
+        <section className="relative py-20 px-6 md:px-8 lg:px-12 overflow-hidden">
+          {/* Background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+          
+          <div className="relative max-w-5xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
               <Leaf className="w-4 h-4" />
               Environmental Compliance Platform
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 tracking-tight">
-              Welcome to <span className="text-gradient">EnviroComply</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
+              Navigate Environmental <br />
+              <span className="text-gradient">Regulations with AI</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
               Cross-reference your project documents against regional, national, and European environmental regulations with AI-powered analysis.
             </p>
           </div>
+        </section>
 
-          {/* Feature Cards */}
-          <div className="grid gap-6 md:grid-cols-3">
-            <FeatureCard
-              icon={Search}
-              title="Environmental Law Chat"
-              description="Research and ask complex questions about specific environmental laws and norms across EU, Italy, and Lombardy."
-              onClick={() => navigate('/law-chat')}
-              variant="primary"
-            />
-            <FeatureCard
-              icon={FileCheck}
-              title="Document Analysis"
-              description="Upload documents and receive AI-powered compliance analysis with detailed violation reports and suggestions."
-              onClick={() => navigate('/document-analysis')}
-              variant="secondary"
-            />
-            <FeatureCard
-              icon={GraduationCap}
-              title="Polimi Course Hub"
-              description="Access specialized tools and documentation relevant to the Polimi environmental engineering curriculum."
-              onClick={() => navigate('/polimi-hub')}
-              variant="accent"
-            />
-          </div>
-
-          {/* Quick Stats or Info */}
-          <div className="mt-12 grid grid-cols-3 gap-4 text-center">
-            <div className="p-4 rounded-xl bg-muted/50">
-              <p className="text-2xl font-bold text-foreground">3</p>
-              <p className="text-sm text-muted-foreground">Regulatory Levels</p>
-            </div>
-            <div className="p-4 rounded-xl bg-muted/50">
-              <p className="text-2xl font-bold text-foreground">8</p>
-              <p className="text-sm text-muted-foreground">Areas of Interest</p>
-            </div>
-            <div className="p-4 rounded-xl bg-muted/50">
-              <p className="text-2xl font-bold text-foreground">AI</p>
-              <p className="text-sm text-muted-foreground">Powered Analysis</p>
+        {/* Feature Cards */}
+        <section className="py-12 px-6 md:px-8 lg:px-12">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid gap-6 md:grid-cols-3">
+              <FeatureCard
+                icon={Search}
+                title="Environmental Law Chat"
+                description="Research and ask complex questions about specific environmental laws and norms across EU, Italy, and Lombardy."
+                onClick={handleFeatureClick}
+                variant="primary"
+              />
+              <FeatureCard
+                icon={FileCheck}
+                title="Document Analysis"
+                description="Upload documents and receive AI-powered compliance analysis with detailed violation reports and suggestions."
+                onClick={handleFeatureClick}
+                variant="secondary"
+              />
+              <FeatureCard
+                icon={GraduationCap}
+                title="Polimi Course Hub"
+                description="Access specialized tools and documentation relevant to the Polimi environmental engineering curriculum."
+                onClick={handleFeatureClick}
+                variant="accent"
+              />
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Benefits Section */}
+        <section className="py-16 px-6 md:px-8 lg:px-12 bg-muted/30">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
+              Why Choose EnviroComply?
+            </h2>
+            <div className="grid gap-8 md:grid-cols-3">
+              <div className="text-center">
+                <div className="inline-flex p-3 rounded-xl bg-primary/10 text-primary mb-4">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <h3 className="font-semibold mb-2">Comprehensive Coverage</h3>
+                <p className="text-sm text-muted-foreground">
+                  Access regulations from EU, Italian national, and Lombardy regional levels in one place.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex p-3 rounded-xl bg-accent/10 text-accent mb-4">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <h3 className="font-semibold mb-2">AI-Powered Analysis</h3>
+                <p className="text-sm text-muted-foreground">
+                  Get instant compliance checks and detailed reports powered by advanced AI models.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex p-3 rounded-xl bg-primary/10 text-primary mb-4">
+                  <GraduationCap className="w-6 h-6" />
+                </div>
+                <h3 className="font-semibold mb-2">Built for Polimi</h3>
+                <p className="text-sm text-muted-foreground">
+                  Tailored specifically for Polimi environmental engineering students and professionals.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="py-12 px-6 md:px-8 lg:px-12">
+          <div className="max-w-3xl mx-auto">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="p-6 rounded-xl bg-muted/50">
+                <p className="text-3xl font-bold text-foreground">3</p>
+                <p className="text-sm text-muted-foreground">Regulatory Levels</p>
+              </div>
+              <div className="p-6 rounded-xl bg-muted/50">
+                <p className="text-3xl font-bold text-foreground">50+</p>
+                <p className="text-sm text-muted-foreground">Legal Norms</p>
+              </div>
+              <div className="p-6 rounded-xl bg-muted/50">
+                <p className="text-3xl font-bold text-foreground">AI</p>
+                <p className="text-sm text-muted-foreground">Powered Analysis</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border py-6 px-6">
+        <div className="max-w-5xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Leaf className="w-4 h-4 text-primary" />
+            <span>EnviroComply</span>
+          </div>
+          <p>© 2024 Polimi Environmental Compliance</p>
+        </div>
+      </footer>
     </div>
   );
 }

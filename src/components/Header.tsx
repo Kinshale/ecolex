@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Leaf, Sun, Moon, LogOut } from 'lucide-react';
+import { Leaf, Sun, Moon, LogOut, Settings, HelpCircle, CreditCard } from 'lucide-react';
 
 export function Header() {
   const navigate = useNavigate();
@@ -23,12 +23,20 @@ export function Header() {
     .join('')
     .toUpperCase() || user?.email?.[0].toUpperCase() || 'U';
 
+  const handleLogoClick = () => {
+    if (user) {
+      navigate('/law-chat');
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="h-full flex items-center justify-between px-6">
         {/* Logo */}
         <button
-          onClick={() => navigate('/')}
+          onClick={handleLogoClick}
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
           <div className="p-2 rounded-xl bg-primary text-primary-foreground">
@@ -82,6 +90,19 @@ export function Header() {
                     </p>
                   </div>
                 </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/help')}>
+                  <HelpCircle className="mr-2 h-4 w-4" />
+                  Help & Support
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/pricing')}>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Pricing
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />

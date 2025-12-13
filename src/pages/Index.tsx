@@ -1,9 +1,10 @@
 import { useAuth } from '@/lib/auth';
 import Dashboard from './Dashboard';
+import LawChat from './LawChat';
 import { Loader2 } from 'lucide-react';
 
 export default function Index() {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -16,6 +17,11 @@ export default function Index() {
     );
   }
 
-  // Dashboard is now accessible to both guests and authenticated users
+  // Authenticated users bypass landing page and go directly to the app
+  if (user) {
+    return <LawChat />;
+  }
+
+  // Guests see the marketing landing page
   return <Dashboard />;
 }
