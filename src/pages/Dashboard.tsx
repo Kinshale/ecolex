@@ -2,17 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { FeatureCard } from '@/components/FeatureCard';
 import { Search, FileCheck, GraduationCap, Leaf, Shield, Zap } from 'lucide-react';
-
 export default function Dashboard() {
   const navigate = useNavigate();
-
   const handleFeatureClick = () => {
     // All features require authentication - redirect to auth
     navigate('/auth');
   };
-
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
+  return <div className="min-h-screen bg-background flex flex-col">
       <Header />
       
       <main className="flex-1 flex flex-col">
@@ -24,10 +20,7 @@ export default function Dashboard() {
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
           
           <div className="relative max-w-5xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
-              <Leaf className="w-4 h-4" />
-              Environmental Compliance Platform
-            </div>
+            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
               Navigate Environmental <br />
               <span className="text-gradient">Regulations with AI</span>
@@ -42,27 +35,9 @@ export default function Dashboard() {
         <section className="py-12 px-6 md:px-8 lg:px-12">
           <div className="max-w-5xl mx-auto">
             <div className="grid gap-6 md:grid-cols-3">
-              <FeatureCard
-                icon={Search}
-                title="Environmental Law Chat"
-                description="Research and ask complex questions about specific environmental laws and norms across EU, Italy, and Lombardy."
-                onClick={handleFeatureClick}
-                variant="primary"
-              />
-              <FeatureCard
-                icon={FileCheck}
-                title="Document Analysis"
-                description="Upload documents and receive AI-powered compliance analysis with detailed violation reports and suggestions."
-                onClick={handleFeatureClick}
-                variant="secondary"
-              />
-              <FeatureCard
-                icon={GraduationCap}
-                title="Polimi Course Hub"
-                description="Access specialized tools and documentation relevant to the Polimi environmental engineering curriculum."
-                onClick={handleFeatureClick}
-                variant="accent"
-              />
+              <FeatureCard icon={Search} title="Environmental Law Chat" description="Research and ask complex questions about specific environmental laws and norms across EU, Italy, and Lombardy." onClick={handleFeatureClick} variant="primary" />
+              <FeatureCard icon={FileCheck} title="Document Analysis" description="Upload documents and receive AI-powered compliance analysis with detailed violation reports and suggestions." onClick={handleFeatureClick} variant="secondary" />
+              <FeatureCard icon={GraduationCap} title="Polimi Course Hub" description="Access specialized tools and documentation relevant to the Polimi environmental engineering curriculum." onClick={handleFeatureClick} variant="accent" />
             </div>
           </div>
         </section>
@@ -136,6 +111,5 @@ export default function Dashboard() {
           <p>© 2024 Polimi Environmental Compliance</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 }
