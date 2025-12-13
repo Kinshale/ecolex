@@ -91,7 +91,8 @@ export default function Dashboard() {
             <Leaf className="w-4 h-4 text-primary" />
             <span>EnviroComply</span>
           </div>
-          <p>© 2024 Polimi Environmental Compliance</p>
+          <p>© 2024  EnviroComply
+        </p>
         </div>
       </footer>
     </div>;

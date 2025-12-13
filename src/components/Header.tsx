@@ -3,26 +3,19 @@ import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Leaf, Sun, Moon, LogOut, Settings, HelpCircle, CreditCard } from 'lucide-react';
-
 export function Header() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-
-  const initials = user?.user_metadata?.full_name
-    ?.split(' ')
-    .map((n: string) => n[0])
-    .join('')
-    .toUpperCase() || user?.email?.[0].toUpperCase() || 'U';
-
+  const {
+    user,
+    signOut
+  } = useAuth();
+  const {
+    theme,
+    toggleTheme
+  } = useTheme();
+  const initials = user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || user?.email?.[0].toUpperCase() || 'U';
   const handleLogoClick = () => {
     if (user) {
       navigate('/law-chat');
@@ -30,41 +23,28 @@ export function Header() {
       navigate('/');
     }
   };
-
-  return (
-    <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+  return <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="h-full flex items-center justify-between px-6">
         {/* Logo */}
-        <button
-          onClick={handleLogoClick}
-          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-        >
+        <button onClick={handleLogoClick} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div className="p-2 rounded-xl bg-primary text-primary-foreground">
             <Leaf className="w-5 h-5" />
           </div>
           <div className="text-left">
             <h1 className="font-semibold text-lg leading-none">EnviroComply</h1>
-            <p className="text-xs text-muted-foreground">Polimi Environmental Compliance</p>
+            <p className="text-xs text-muted-foreground"> Environmental Compliance
+  
+  </p>
           </div>
         </button>
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            {theme === 'light' ? (
-              <Moon className="w-5 h-5" />
-            ) : (
-              <Sun className="w-5 h-5" />
-            )}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="text-muted-foreground hover:text-foreground">
+            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </Button>
 
-          {user ? (
-            <DropdownMenu>
+          {user ? <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
@@ -109,24 +89,15 @@ export function Header() {
                   Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/auth')}
-              >
+            </DropdownMenu> : <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={() => navigate('/auth')}>
                 Log In
               </Button>
-              <Button
-                onClick={() => navigate('/auth?mode=signup')}
-              >
+              <Button onClick={() => navigate('/auth?mode=signup')}>
                 Sign Up
               </Button>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
-    </header>
-  );
+    </header>;
 }
