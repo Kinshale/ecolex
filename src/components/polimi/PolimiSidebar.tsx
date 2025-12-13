@@ -1,35 +1,35 @@
 import { useCallback, useState } from 'react';
-import { GraduationCap, BookOpen, Upload, X, FileText, ChevronDown } from 'lucide-react';
+import { GraduationCap, BookOpen, Upload, X, FileText, Lock } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import type { Faculty } from '@/pages/PolimiHub';
+import type { Degree } from '@/pages/PolimiHub';
 
 interface PolimiSidebarProps {
-  faculties: Faculty[];
-  selectedFacultyId: string;
+  degrees: Degree[];
+  selectedDegreeId: string;
   selectedCourseId: string;
   uploadedFiles: File[];
-  onFacultyChange: (facultyId: string) => void;
+  onDegreeChange: (degreeId: string) => void;
   onCourseChange: (courseId: string) => void;
   onFilesUpload: (files: File[]) => void;
   onRemoveFile: (index: number) => void;
 }
 
 export function PolimiSidebar({
-  faculties,
-  selectedFacultyId,
+  degrees,
+  selectedDegreeId,
   selectedCourseId,
   uploadedFiles,
-  onFacultyChange,
+  onDegreeChange,
   onCourseChange,
   onFilesUpload,
   onRemoveFile,
 }: PolimiSidebarProps) {
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const selectedFaculty = faculties.find(f => f.id === selectedFacultyId);
+  const selectedDegree = degrees.find(d => d.id === selectedDegreeId);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -76,27 +76,39 @@ export function PolimiSidebar({
           <div className="p-1.5 rounded-lg bg-primary/10">
             <GraduationCap className="w-4 h-4 text-primary" />
           </div>
-          <h2 className="font-semibold text-sm">Polimi AI Hub</h2>
+          <h2 className="font-semibold text-sm">Polimi Student AI Hub</h2>
         </div>
-        <p className="text-xs text-muted-foreground">Select your course to get started</p>
+        <p className="text-xs text-muted-foreground">Select your degree and course</p>
       </div>
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-5">
-          {/* Faculty Selector */}
+          {/* Degree Selector */}
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5" />
-              School / Faculty
+              Master of Science Degree
             </label>
-            <Select value={selectedFacultyId} onValueChange={onFacultyChange}>
+            <Select value={selectedDegreeId} onValueChange={onDegreeChange}>
               <SelectTrigger className="w-full bg-background text-sm h-9">
-                <SelectValue placeholder="Select faculty" />
+                <SelectValue placeholder="Select degree" />
               </SelectTrigger>
-              <SelectContent>
-                {faculties.map(faculty => (
-                  <SelectItem key={faculty.id} value={faculty.id} className="text-sm">
-                    {faculty.name}
+              <SelectContent className="max-h-[300px]">
+                {degrees.map(degree => (
+                  <SelectItem 
+                    key={degree.id} 
+                    value={degree.id} 
+                    className={cn(
+                      "text-sm",
+                      !degree.isActive && "text-muted-foreground"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      {!degree.isActive && <Lock className="w-3 h-3 text-muted-foreground" />}
+                      <span className={degree.isActive ? "font-medium" : ""}>
+                        {degree.name}
+                      </span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -107,16 +119,28 @@ export function PolimiSidebar({
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5" />
-              Course
+              Course Module
             </label>
             <Select value={selectedCourseId} onValueChange={onCourseChange}>
               <SelectTrigger className="w-full bg-background text-sm h-9">
                 <SelectValue placeholder="Select course" />
               </SelectTrigger>
               <SelectContent>
-                {selectedFaculty?.courses.map(course => (
-                  <SelectItem key={course.id} value={course.id} className="text-sm">
-                    {course.name}
+                {selectedDegree?.courses.map(course => (
+                  <SelectItem 
+                    key={course.id} 
+                    value={course.id} 
+                    className={cn(
+                      "text-sm",
+                      !course.isActive && "text-muted-foreground"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      {!course.isActive && <Lock className="w-3 h-3 text-muted-foreground" />}
+                      <span className={course.isActive ? "font-medium" : ""}>
+                        {course.name}
+                      </span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
