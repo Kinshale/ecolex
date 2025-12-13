@@ -1,5 +1,72 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+const COURSE_KNOWLEDGE: Record<string, string> = {
+  "Soil Remediation": `
+    COURSE TITLE: Soil Remediation (095876)
+    PROFESSOR: Sabrina Saponaro
+
+    KEY OBJECTIVES:
+    - Address contaminated sites (chemical pollution in soil, subsoil, groundwater).
+    - Design management and intervention strategies.
+    - Perform human health and environmental risk assessment.
+
+    CORE TOPICS & TECHNOLOGIES:
+    1. Soil Physics & Models:
+       - Equations for water flow (saturated/unsaturated zones) and air flow.
+       - Pollutant fate and transport models (dissolved in water vs vapor in soil gas).
+    2. Characterization & Monitoring:
+       - Procedures for soil, subsoil, groundwater, and soil gas sampling.
+       - Chemical analysis methods.
+    3. Risk Assessment:
+       - Site-specific risk analysis (human health focus).
+       - Calculation of acceptable remediation target limits.
+    4. Remediation Technologies (The "Tech Stack"):
+       - For SOIL: Solidification/Stabilization, Soil Washing, Soil Vapor Extraction (SVE), Biopiles, Bioventing, Thermal Conductive Heating.
+       - For GROUNDWATER: Air Sparging, Permeable Reactive Barriers (PRB), In Situ Chemical Oxidation (ISCO).
+       - For BIOLOGICAL: Biosparging, Biobarriers, Aerobic/Anaerobic Enhanced Bioremediation.
+       - LNAPL: Recovery and soil interaction.
+
+    LEGAL FRAMEWORK:
+    - Focus on Italian Regulation (D.Lgs 152/2006) and EU directives.
+
+    EXAM/PROJECT INFO:
+    - Students work in teams to design remediation actions (Investigation plan, Risk assessment, Pilot test design).
+  `,
+
+  "Environmental Impact Assessment": `
+    COURSE TITLE: Environmental Impact Assessment (054594)
+    PROFESSOR: Arianna Azzellino
+
+    KEY OBJECTIVES:
+    - Quantify impacts of newly constructed works/infrastructure.
+    - Evaluate environmental compatibility and design mitigation measures.
+    - Use simulation tools (GIS, pollutant dispersion models).
+
+    CORE TOPICS & PROCEDURES:
+    1. Regulatory Framework:
+       - EU Directives vs Italian Legislation (National vs Regional EIA).
+       - Related procedures: SEA (VAS), IPPC/AIA, VINCA (Incidence Assessment).
+    2. The EIA Study (SIA) Contents:
+       - Programmatic and Project Framework.
+       - Environmental Framework (Quadro Ambientale).
+       - Impact Prediction, Mitigation, Compensation, and Monitoring Plan.
+    3. Environmental Components Analyzed:
+       - Atmosphere (Air quality models).
+       - Water environment (Wastewater effects).
+       - Soil & Subsoil.
+       - Vegetation, Flora, Fauna, Ecosystems (Habitat directives).
+       - Public Health & Physical Agents (Noise, Radiation).
+       - Landscape.
+    4. Methodologies:
+       - Scenario Analysis (Comparison of alternatives).
+       - Indicators for qualitative-quantitative assessment (Negligible, Perceptible, Mitigable impacts).
+
+    PROJECT INFO:
+    - Case studies include road infrastructures or wastewater plants.
+    - Tools used: GIS software, Minitab, statistical models.
+  `
+};
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -23,11 +90,17 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Build the enhanced system prompt
+    // Get course-specific knowledge
+    const courseKnowledge = COURSE_KNOWLEDGE[courseName] || '';
+
+    // Build the enhanced system prompt with course knowledge
     const enhancedSystemPrompt = `${systemPrompt}
+
+${courseKnowledge ? `OFFICIAL COURSE SYLLABUS KNOWLEDGE:\n${courseKnowledge}` : ''}
 
 IMPORTANT GUIDELINES:
 - When course materials are provided, prioritize information from those documents
+- Use the official syllabus knowledge above to provide accurate, course-specific answers
 - Be precise and technical in your explanations
 - Use academic terminology appropriate for university-level engineering students
 - Include relevant formulas, standards, and references when applicable
