@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { GraduationCap, BookOpen, Upload, X, FileText, Lock } from 'lucide-react';
+import { GraduationCap, BookOpen, Upload, X, FileText } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -98,17 +98,9 @@ export function PolimiSidebar({
                   <SelectItem 
                     key={degree.id} 
                     value={degree.id} 
-                    className={cn(
-                      "text-sm",
-                      !degree.isActive && "text-muted-foreground"
-                    )}
+                    className="text-sm cursor-pointer"
                   >
-                    <div className="flex items-center gap-2">
-                      {!degree.isActive && <Lock className="w-3 h-3 text-muted-foreground" />}
-                      <span className={degree.isActive ? "font-medium" : ""}>
-                        {degree.name}
-                      </span>
-                    </div>
+                    {degree.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -130,17 +122,9 @@ export function PolimiSidebar({
                   <SelectItem 
                     key={course.id} 
                     value={course.id} 
-                    className={cn(
-                      "text-sm",
-                      !course.isActive && "text-muted-foreground"
-                    )}
+                    className="text-sm cursor-pointer"
                   >
-                    <div className="flex items-center gap-2">
-                      {!course.isActive && <Lock className="w-3 h-3 text-muted-foreground" />}
-                      <span className={course.isActive ? "font-medium" : ""}>
-                        {course.name}
-                      </span>
-                    </div>
+                    {course.name}
                   </SelectItem>
                 ))}
               </SelectContent>

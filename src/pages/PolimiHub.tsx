@@ -95,7 +95,7 @@ const DEGREES: Degree[] = [
   },
   {
     id: 'environmental',
-    name: 'Environmental and Land Planning Engineering',
+    name: 'Civil, Environmental & Land Management Engineering',
     isActive: true,
     courses: [
       {
@@ -218,8 +218,8 @@ export default function PolimiHub() {
     const degree = DEGREES.find(d => d.id === degreeId);
     
     if (!degree?.isActive) {
-      toast.error('Demo Restricted', {
-        description: `${degree?.name} is not available in this demo. Please select "Environmental and Land Planning Engineering".`
+      toast.info('Demo Mode', {
+        description: `Access to ${degree?.name} is restricted during the presentation.`
       });
       return;
     }
@@ -236,8 +236,8 @@ export default function PolimiHub() {
     const course = selectedDegree?.courses.find(c => c.id === courseId);
     
     if (!course?.isActive) {
-      toast.warning('Module Under Construction', {
-        description: `${course?.name} module is currently being developed. Please select "Soil Remediation" or "Environmental Impact Assessment".`
+      toast.info('Course Offline', {
+        description: `Full dataset for ${course?.name} is currently processing. Please use the Demo Tracks.`
       });
       return;
     }
