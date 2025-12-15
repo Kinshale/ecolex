@@ -1,69 +1,74 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const COURSE_KNOWLEDGE: Record<string, string> = {
-  "Soil Remediation": `
-    COURSE TITLE: Soil Remediation (095876)
-    PROFESSOR: Sabrina Saponaro
-
-    KEY OBJECTIVES:
-    - Address contaminated sites (chemical pollution in soil, subsoil, groundwater).
-    - Design management and intervention strategies.
-    - Perform human health and environmental risk assessment.
-
-    CORE TOPICS & TECHNOLOGIES:
-    1. Soil Physics & Models:
-       - Equations for water flow (saturated/unsaturated zones) and air flow.
-       - Pollutant fate and transport models (dissolved in water vs vapor in soil gas).
-    2. Characterization & Monitoring:
-       - Procedures for soil, subsoil, groundwater, and soil gas sampling.
-       - Chemical analysis methods.
-    3. Risk Assessment:
-       - Site-specific risk analysis (human health focus).
-       - Calculation of acceptable remediation target limits.
-    4. Remediation Technologies (The "Tech Stack"):
-       - For SOIL: Solidification/Stabilization, Soil Washing, Soil Vapor Extraction (SVE), Biopiles, Bioventing, Thermal Conductive Heating.
-       - For GROUNDWATER: Air Sparging, Permeable Reactive Barriers (PRB), In Situ Chemical Oxidation (ISCO).
-       - For BIOLOGICAL: Biosparging, Biobarriers, Aerobic/Anaerobic Enhanced Bioremediation.
-       - LNAPL: Recovery and soil interaction.
-
-    LEGAL FRAMEWORK:
-    - Focus on Italian Regulation (D.Lgs 152/2006) and EU directives.
-
-    EXAM/PROJECT INFO:
-    - Students work in teams to design remediation actions (Investigation plan, Risk assessment, Pilot test design).
+// Knowledge base for regulatory context
+const DEGREE_KNOWLEDGE: Record<string, string> = {
+  "Ingegneria per l'Ambiente e il Territorio": `
+    AMBITO NORMATIVO PRINCIPALE:
+    - Normative ambientali italiane (D.Lgs 152/2006 - Testo Unico Ambientale)
+    - Direttive europee ambientali (VIA, VAS, IPPC/AIA)
+    - Regolamenti sulla bonifica dei siti contaminati
+    - Normative sulla gestione dei rifiuti e acque reflue
+    - Regolamenti sulla qualità dell'aria e dell'acqua
+    - Procedure di Valutazione di Impatto Ambientale (VIA/SIA)
+    - Normative sulla sicurezza idraulica e idrogeologica
+    - Regolamenti regionali lombardi in materia ambientale
   `,
-
-  "Environmental Impact Assessment": `
-    COURSE TITLE: Environmental Impact Assessment (054594)
-    PROFESSOR: Arianna Azzellino
-
-    KEY OBJECTIVES:
-    - Quantify impacts of newly constructed works/infrastructure.
-    - Evaluate environmental compatibility and design mitigation measures.
-    - Use simulation tools (GIS, pollutant dispersion models).
-
-    CORE TOPICS & PROCEDURES:
-    1. Regulatory Framework:
-       - EU Directives vs Italian Legislation (National vs Regional EIA).
-       - Related procedures: SEA (VAS), IPPC/AIA, VINCA (Incidence Assessment).
-    2. The EIA Study (SIA) Contents:
-       - Programmatic and Project Framework.
-       - Environmental Framework (Quadro Ambientale).
-       - Impact Prediction, Mitigation, Compensation, and Monitoring Plan.
-    3. Environmental Components Analyzed:
-       - Atmosphere (Air quality models).
-       - Water environment (Wastewater effects).
-       - Soil & Subsoil.
-       - Vegetation, Flora, Fauna, Ecosystems (Habitat directives).
-       - Public Health & Physical Agents (Noise, Radiation).
-       - Landscape.
-    4. Methodologies:
-       - Scenario Analysis (Comparison of alternatives).
-       - Indicators for qualitative-quantitative assessment (Negligible, Perceptible, Mitigable impacts).
-
-    PROJECT INFO:
-    - Case studies include road infrastructures or wastewater plants.
-    - Tools used: GIS software, Minitab, statistical models.
+  "Ingegneria Civile": `
+    AMBITO NORMATIVO PRINCIPALE:
+    - Norme Tecniche per le Costruzioni (NTC 2018)
+    - Normative antisismiche
+    - Codice della Strada e regolamenti infrastrutturali
+    - Normative sulla sicurezza nei cantieri (D.Lgs 81/2008)
+    - Regolamenti edilizi comunali
+  `,
+  "Ingegneria Edile e delle Costruzioni": `
+    AMBITO NORMATIVO PRINCIPALE:
+    - Normative edilizie e Testo Unico Edilizia (DPR 380/2001)
+    - Norme Tecniche per le Costruzioni
+    - Certificazione energetica degli edifici
+    - Normative sulla sicurezza nei cantieri
+    - Regolamenti urbanistici
+  `,
+  "Ingegneria Edile-Architettura": `
+    AMBITO NORMATIVO PRINCIPALE:
+    - Normative edilizie e urbanistiche
+    - Codice dei Beni Culturali e del Paesaggio
+    - Normative sulla sostenibilità degli edifici
+    - Regolamenti paesaggistici
+    - Norme sul risparmio energetico
+  `,
+  "Industrial Safety and Risk Engineering": `
+    REGULATORY FOCUS:
+    - Seveso III Directive (2012/18/EU)
+    - Italian D.Lgs 105/2015 (Major accident hazards)
+    - Workplace safety regulations (D.Lgs 81/2008)
+    - ATEX Directives (explosive atmospheres)
+    - Risk assessment methodologies (HAZOP, FMEA)
+    - Emergency planning regulations
+  `,
+  "Sustainable Architecture and Landscape Design": `
+    REGULATORY FOCUS:
+    - EU Energy Performance of Buildings Directive (EPBD)
+    - Italian energy efficiency regulations
+    - Landscape protection laws
+    - Environmental sustainability standards (LEED, BREEAM)
+    - EU Taxonomy for sustainable activities
+  `,
+  "Urban Planning and Policy Design": `
+    REGULATORY FOCUS:
+    - Italian urban planning law (L. 1150/1942 and updates)
+    - Regional territorial planning regulations
+    - Strategic Environmental Assessment (SEA/VAS)
+    - Urban regeneration regulations
+    - EU Cohesion Policy framework
+  `,
+  "Urban Planning: Cities, Environment and Landscapes": `
+    REGULATORY FOCUS:
+    - Environmental urban planning regulations
+    - EU Green Deal and urban sustainability
+    - Climate adaptation regulations
+    - Protected areas and ecological networks
+    - Landscape planning instruments
   `
 };
 
@@ -73,7 +78,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -90,30 +94,45 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Get course-specific knowledge
-    const courseKnowledge = COURSE_KNOWLEDGE[courseName] || '';
+    // Get degree-specific regulatory knowledge
+    const degreeKnowledge = DEGREE_KNOWLEDGE[courseName] || '';
 
-    // Build the enhanced system prompt with course knowledge
-    const enhancedSystemPrompt = `${systemPrompt}
+    // Build the enhanced system prompt focused on regulatory topics
+    const enhancedSystemPrompt = `Sei un assistente AI specializzato in normative e regolamenti per studenti e docenti del Politecnico di Milano.
 
-${courseKnowledge ? `OFFICIAL COURSE SYLLABUS KNOWLEDGE:\n${courseKnowledge}` : ''}
+CONTESTO ISTITUZIONALE:
+- Operi esclusivamente nel contesto del Politecnico di Milano
+- L'utente è uno studente o docente del corso: ${courseName}
+- Le risposte devono essere pertinenti al contesto accademico, progettuale e professionale
 
-STRICT RESPONSE RULES:
-1. NEVER introduce yourself or your credentials. Do NOT say "As a Senior Engineer..." or "As an expert...". Start immediately with the answer.
-2. Keep responses concise (150-200 words max) unless explicitly asked for detailed analysis.
-3. Use bullet points for lists to improve readability.
-4. Use LaTeX formatting for ALL math, formulas, and chemical equations:
-   - Use single dollar signs for inline math: $C_{10}H_{22}$
-   - Use double dollar signs for block equations: $$C_t = C_0 \cdot e^{-kt}$$
-5. When course materials are provided, prioritize information from those documents.
-6. Use the official syllabus knowledge above for accurate, course-specific answers.
-7. Be precise and technical with university-level engineering terminology.
-8. If unsure, acknowledge it clearly.
+${degreeKnowledge ? `AMBITO NORMATIVO SPECIFICO DEL CORSO:\n${degreeKnowledge}` : ''}
 
-Course Context: ${courseName}
-Institution: Politecnico di Milano`;
+AREE DI COMPETENZA (rispondi SOLO a domande su):
+1. Normative e leggi ambientali italiane ed europee
+2. Regolamenti urbanistici ed edilizi
+3. Norme su sicurezza, rischio industriale e sostenibilità
+4. Applicazioni normative in ambito accademico, progettuale e professionale
+5. Procedure autorizzative (VIA, VAS, AIA, permessi edilizi)
+6. Direttive EU e loro recepimento in Italia
+7. Regolamenti regionali (in particolare Lombardia)
 
-    console.log(`Processing chat request for course: ${courseName}`);
+REGOLE DI RISPOSTA RIGOROSE:
+1. NON presentarti MAI. NON dire "Come esperto..." o "In qualità di...". Inizia subito con la risposta.
+2. Risposte concise (150-200 parole max) salvo richiesta esplicita di approfondimento.
+3. Usa elenchi puntati per migliorare la leggibilità.
+4. Usa LaTeX per formule matematiche:
+   - Inline: $formula$
+   - Block: $$formula$$
+5. Cita sempre gli articoli e i riferimenti normativi specifici.
+6. Sii preciso e tecnico con terminologia universitaria.
+
+GESTIONE DOMANDE FUORI AMBITO:
+Se la domanda NON riguarda normative, regolamenti, leggi ambientali/urbanistiche/edilizie/di sicurezza, o NON è pertinente al contesto Polimi, rispondi:
+"Mi dispiace, questa domanda non rientra nel mio ambito di competenza. Sono specializzato in normative ambientali, urbanistiche, edilizie e di sicurezza per studenti del Politecnico di Milano. Posso aiutarti con questioni relative a leggi, regolamenti e procedure autorizzative in questi ambiti."
+
+${systemPrompt ? `\nISTRUZIONI AGGIUNTIVE: ${systemPrompt}` : ''}`;
+
+    console.log(`Processing chat request for degree: ${courseName}`);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -136,14 +155,14 @@ Institution: Politecnico di Milano`;
 
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }),
+          JSON.stringify({ error: 'Limite di richieste superato. Riprova tra un momento.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: 'Service quota exceeded. Please try again later.' }),
+          JSON.stringify({ error: 'Quota di servizio esaurita. Riprova più tardi.' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -152,7 +171,7 @@ Institution: Politecnico di Milano`;
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
+    const content = data.choices?.[0]?.message?.content || 'Mi dispiace, non sono riuscito a generare una risposta.';
 
     console.log(`Successfully generated response for ${courseName}`);
 
@@ -162,7 +181,7 @@ Institution: Politecnico di Milano`;
     );
   } catch (error: unknown) {
     console.error('Polimi chat error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    const errorMessage = error instanceof Error ? error.message : 'Si è verificato un errore imprevisto';
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
