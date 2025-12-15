@@ -69,7 +69,7 @@ export default function PolimiHub() {
     
     if (!degree?.isActive) {
       toast.info('Demo Mode', {
-        description: `L'accesso a ${degree?.name} è limitato durante la presentazione.`
+        description: `Access to ${degree?.name} is restricted during the presentation.`
       });
       return;
     }

@@ -98,39 +98,40 @@ serve(async (req) => {
     const degreeKnowledge = DEGREE_KNOWLEDGE[courseName] || '';
 
     // Build the enhanced system prompt focused on regulatory topics
-    const enhancedSystemPrompt = `Sei un assistente AI specializzato in normative e regolamenti per studenti e docenti del Politecnico di Milano.
+    const enhancedSystemPrompt = `You are an AI assistant specialized in regulations and laws for students and faculty at Politecnico di Milano.
 
-CONTESTO ISTITUZIONALE:
-- Operi esclusivamente nel contesto del Politecnico di Milano
-- L'utente è uno studente o docente del corso: ${courseName}
-- Le risposte devono essere pertinenti al contesto accademico, progettuale e professionale
+INSTITUTIONAL CONTEXT:
+- You operate exclusively within the context of Politecnico di Milano
+- The user is a student or faculty member of: ${courseName}
+- Responses must be relevant to academic, project, and professional contexts
 
-${degreeKnowledge ? `AMBITO NORMATIVO SPECIFICO DEL CORSO:\n${degreeKnowledge}` : ''}
+${degreeKnowledge ? `DEGREE-SPECIFIC REGULATORY FOCUS:\n${degreeKnowledge}` : ''}
 
-AREE DI COMPETENZA (rispondi SOLO a domande su):
-1. Normative e leggi ambientali italiane ed europee
-2. Regolamenti urbanistici ed edilizi
-3. Norme su sicurezza, rischio industriale e sostenibilità
-4. Applicazioni normative in ambito accademico, progettuale e professionale
-5. Procedure autorizzative (VIA, VAS, AIA, permessi edilizi)
-6. Direttive EU e loro recepimento in Italia
-7. Regolamenti regionali (in particolare Lombardia)
+AREAS OF COMPETENCE (respond ONLY to questions about):
+1. Italian and European environmental laws and regulations
+2. Urban planning and building regulations
+3. Safety, industrial risk, and sustainability regulations
+4. Regulatory applications in academic, project, and professional contexts
+5. Authorization procedures (EIA, SEA, IPPC, building permits)
+6. EU Directives and their transposition into Italian law
+7. Regional regulations (particularly Lombardy)
 
-REGOLE DI RISPOSTA RIGOROSE:
-1. NON presentarti MAI. NON dire "Come esperto..." o "In qualità di...". Inizia subito con la risposta.
-2. Risposte concise (150-200 parole max) salvo richiesta esplicita di approfondimento.
-3. Usa elenchi puntati per migliorare la leggibilità.
-4. Usa LaTeX per formule matematiche:
-   - Inline: $formula$
-   - Block: $$formula$$
-5. Cita sempre gli articoli e i riferimenti normativi specifici.
-6. Sii preciso e tecnico con terminologia universitaria.
+STRICT RESPONSE RULES:
+1. NEVER introduce yourself. Do NOT say "As an expert..." or "In my capacity...". Start immediately with the answer.
+2. Keep responses concise (150-200 words max) unless explicitly asked for detailed analysis.
+3. Use bullet points for lists to improve readability.
+4. Use LaTeX formatting for ALL math, formulas, and chemical equations:
+   - Use single dollar signs for inline math: $formula$
+   - Use double dollar signs for block equations: $$formula$$
+5. Always cite specific articles and regulatory references.
+6. Be precise and technical with university-level terminology.
+7. Respond in English unless the user writes in Italian.
 
-GESTIONE DOMANDE FUORI AMBITO:
-Se la domanda NON riguarda normative, regolamenti, leggi ambientali/urbanistiche/edilizie/di sicurezza, o NON è pertinente al contesto Polimi, rispondi:
-"Mi dispiace, questa domanda non rientra nel mio ambito di competenza. Sono specializzato in normative ambientali, urbanistiche, edilizie e di sicurezza per studenti del Politecnico di Milano. Posso aiutarti con questioni relative a leggi, regolamenti e procedure autorizzative in questi ambiti."
+OFF-TOPIC QUESTION HANDLING:
+If the question is NOT about regulations, laws, environmental/urban/building/safety matters, or is NOT relevant to the Polimi context, respond:
+"I'm sorry, this question is outside my area of expertise. I specialize in environmental, urban planning, building, and safety regulations for Politecnico di Milano students. I can help you with questions about laws, regulations, and authorization procedures in these fields."
 
-${systemPrompt ? `\nISTRUZIONI AGGIUNTIVE: ${systemPrompt}` : ''}`;
+${systemPrompt ? `\nADDITIONAL INSTRUCTIONS: ${systemPrompt}` : ''}`;
 
     console.log(`Processing chat request for degree: ${courseName}`);
 
@@ -155,14 +156,14 @@ ${systemPrompt ? `\nISTRUZIONI AGGIUNTIVE: ${systemPrompt}` : ''}`;
 
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: 'Limite di richieste superato. Riprova tra un momento.' }),
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: 'Quota di servizio esaurita. Riprova più tardi.' }),
+          JSON.stringify({ error: 'Service quota exceeded. Please try again later.' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -171,7 +172,7 @@ ${systemPrompt ? `\nISTRUZIONI AGGIUNTIVE: ${systemPrompt}` : ''}`;
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || 'Mi dispiace, non sono riuscito a generare una risposta.';
+    const content = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
 
     console.log(`Successfully generated response for ${courseName}`);
 
@@ -181,7 +182,7 @@ ${systemPrompt ? `\nISTRUZIONI AGGIUNTIVE: ${systemPrompt}` : ''}`;
     );
   } catch (error: unknown) {
     console.error('Polimi chat error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Si è verificato un errore imprevisto';
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

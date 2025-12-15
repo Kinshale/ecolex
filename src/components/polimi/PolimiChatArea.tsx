@@ -31,29 +31,29 @@ interface PolimiChatAreaProps {
 // Quick actions focused on regulatory topics
 const QUICK_ACTIONS: QuickAction[] = [
   {
-    label: '⚖️ Normativa VIA',
+    label: '⚖️ EIA Regulations',
     icon: <Scale className="w-3.5 h-3.5" />,
-    action: 'Quali sono i contenuti obbligatori dello Studio di Impatto Ambientale secondo il D.Lgs 152/2006?'
+    action: 'What are the mandatory contents of an Environmental Impact Study according to D.Lgs 152/2006?'
   },
   {
     label: '📄 D.Lgs 152/2006',
     icon: <FileText className="w-3.5 h-3.5" />,
-    action: 'Spiega la struttura del Testo Unico Ambientale (D.Lgs 152/2006) e le sue parti principali.'
+    action: 'Explain the structure of the Italian Environmental Code (D.Lgs 152/2006) and its main parts.'
   },
   {
-    label: '🇪🇺 Direttive EU',
+    label: '🇪🇺 EU Directives',
     icon: <Globe className="w-3.5 h-3.5" />,
-    action: 'Quali sono le principali direttive europee in materia ambientale recepite in Italia?'
+    action: 'What are the main EU environmental directives transposed into Italian law?'
   },
   {
-    label: '🏗️ Edilizia',
+    label: '🏗️ Building',
     icon: <Building className="w-3.5 h-3.5" />,
-    action: 'Quali autorizzazioni sono necessarie per un intervento edilizio secondo il DPR 380/2001?'
+    action: 'What permits are required for a building project according to DPR 380/2001?'
   },
   {
-    label: '🛡️ Sicurezza',
+    label: '🛡️ Safety',
     icon: <Shield className="w-3.5 h-3.5" />,
-    action: 'Cosa prevede la Direttiva Seveso III per gli stabilimenti a rischio di incidente rilevante?'
+    action: 'What does the Seveso III Directive require for major accident hazard establishments?'
   }
 ];
 
@@ -92,7 +92,7 @@ export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiCha
 
     try {
       const contextPrefix = fileContents 
-        ? `\n\n--- DOCUMENTI CARICATI ---\n${fileContents}\n--- FINE DOCUMENTI ---\n\nBasandoti sui documenti sopra e sulla tua competenza normativa, rispondi alla seguente domanda:\n\n`
+        ? `\n\n--- UPLOADED DOCUMENTS ---\n${fileContents}\n--- END OF DOCUMENTS ---\n\nBased on the documents above and your regulatory expertise, answer the following question:\n\n`
         : '';
 
       const response = await supabase.functions.invoke('polimi-chat', {
@@ -112,7 +112,7 @@ export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiCha
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: response.data?.content || 'Mi dispiace, non sono riuscito a generare una risposta.',
+        content: response.data?.content || 'Sorry, I could not generate a response.',
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -121,7 +121,7 @@ export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiCha
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: 'Si è verificato un errore. Per favore riprova.',
+        content: 'An error occurred. Please try again.',
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -144,7 +144,7 @@ export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiCha
   if (!degreeName) {
     return (
       <div className="flex-1 flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Seleziona un corso di laurea per iniziare</p>
+        <p className="text-muted-foreground">Select a degree program to begin</p>
       </div>
     );
   }
@@ -157,9 +157,9 @@ export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiCha
           <Sparkles className="w-4 h-4 text-primary" />
         </div>
         <div>
-          <h1 className="text-sm font-semibold">Assistente Normativo: {degreeName}</h1>
+          <h1 className="text-sm font-semibold">Regulatory Assistant: {degreeName}</h1>
           <p className="text-[10px] text-muted-foreground">
-            {hasFiles ? 'Utilizzo i documenti caricati' : 'Nessun documento caricato'}
+            {hasFiles ? 'Using uploaded documents' : 'No documents uploaded'}
           </p>
         </div>
       </header>
@@ -182,7 +182,7 @@ export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiCha
           {isLoading && (
             <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm">Elaborazione in corso...</span>
+              <span className="text-sm">Thinking...</span>
             </div>
           )}
         </div>
@@ -212,7 +212,7 @@ export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiCha
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Chiedi informazioni su normative ambientali, urbanistiche, edilizie..."
+              placeholder="Ask about environmental, urban planning, building, or safety regulations..."
               className="min-h-[44px] max-h-32 resize-none pr-12 bg-background"
               disabled={isLoading}
             />
@@ -226,7 +226,7 @@ export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiCha
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground mt-2 text-center">
-            Premi Invio per inviare, Shift+Invio per nuova riga
+            Press Enter to send, Shift+Enter for new line
           </p>
         </div>
       </div>
@@ -247,15 +247,15 @@ function EmptyState({ degreeName, hasFiles, quickActions, onQuickAction }: Empty
       <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 mb-6">
         <BookOpen className="w-10 h-10 text-primary" />
       </div>
-      <h2 className="text-lg font-semibold mb-2">Assistente Normativo per {degreeName}</h2>
+      <h2 className="text-lg font-semibold mb-2">Regulatory Assistant for {degreeName}</h2>
       <p className="text-muted-foreground text-sm max-w-md mb-2">
         {hasFiles 
-          ? 'Ho caricato i tuoi documenti. Chiedimi informazioni su normative e regolamenti!'
-          : 'Carica documenti normativi o chiedimi informazioni su leggi ambientali, urbanistiche, edilizie e di sicurezza.'
+          ? 'I\'ve loaded your documents. Ask me about regulations and laws!'
+          : 'Upload regulatory documents or ask about environmental, urban planning, building, and safety laws.'
         }
       </p>
       <p className="text-muted-foreground text-xs max-w-md">
-        Focus su: D.Lgs 152/2006 • Direttive EU • Regolamenti edilizi • Sicurezza industriale
+        Focus: D.Lgs 152/2006 • EU Directives • Building Codes • Industrial Safety
       </p>
       {quickActions.length > 0 && (
         <div className="mt-6 flex flex-wrap justify-center gap-2">
