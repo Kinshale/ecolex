@@ -31,7 +31,7 @@ export function Header() {
             <Leaf className="w-5 h-5" />
           </div>
           <div className="text-left">
-            <h1 className="font-semibold text-lg leading-none">EnviroComply</h1>
+            <h1 className="font-semibold text-lg leading-none">EcoLex</h1>
             <p className="text-xs text-muted-foreground"> Environmental Compliance
   
   </p>

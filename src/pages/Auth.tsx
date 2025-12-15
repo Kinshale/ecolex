@@ -104,7 +104,7 @@ export default function Auth() {
         } else {
           toast({
             title: 'Account created!',
-            description: 'Welcome to EnviroComply. You are now signed in.'
+            description: 'Welcome to EcoLex. You are now signed in.'
           });
         }
       }
@@ -121,7 +121,7 @@ export default function Auth() {
           <div className="p-2.5 rounded-xl bg-primary text-primary-foreground">
             <Leaf className="w-7 h-7" />
           </div>
-          <span className="text-2xl font-semibold text-foreground">EnviroComply</span>
+          <span className="text-2xl font-semibold text-foreground">EcoLex</span>
         </div>
 
         <Card className="shadow-medium border-border/50">
