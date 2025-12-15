@@ -72,7 +72,7 @@ export function PolimiSidebar({
           </div>
           <h2 className="font-semibold text-sm">Polimi Student AI Hub</h2>
         </div>
-        <p className="text-xs text-muted-foreground">Assistente normativo per studenti Polimi</p>
+        <p className="text-xs text-muted-foreground">Regulatory assistant for Polimi students</p>
       </div>
 
       <ScrollArea className="flex-1">
@@ -81,11 +81,11 @@ export function PolimiSidebar({
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <GraduationCap className="w-3.5 h-3.5" />
-              Corso di Laurea
+              Degree Program
             </label>
             <Select value={selectedDegreeId} onValueChange={onDegreeChange}>
               <SelectTrigger className="w-full bg-background text-sm h-9">
-                <SelectValue placeholder="Seleziona corso" />
+                <SelectValue placeholder="Select degree" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
                 {degrees.map(degree => (
@@ -105,10 +105,10 @@ export function PolimiSidebar({
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <Upload className="w-3.5 h-3.5" />
-              Documenti di Riferimento
+              Reference Documents
             </label>
             <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
-              Carica normative, regolamenti o documenti per contestualizzare le risposte
+              Upload regulations or documents to contextualize responses
             </p>
             
             {/* Drop Zone */}
@@ -143,10 +143,10 @@ export function PolimiSidebar({
                 </div>
                 <div>
                   <p className="text-xs font-medium">
-                    {isDragOver ? "Rilascia qui" : "Trascina i file"}
+                    {isDragOver ? "Drop files here" : "Drag & drop files"}
                   </p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">
-                    PDF, TXT, MD supportati
+                    PDF, TXT, MD supported
                   </p>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export function PolimiSidebar({
             {uploadedFiles.length > 0 && (
               <div className="space-y-1.5 mt-3">
                 <p className="text-[10px] text-muted-foreground font-medium">
-                  {uploadedFiles.length} file caricati
+                  {uploadedFiles.length} file{uploadedFiles.length > 1 ? 's' : ''} uploaded
                 </p>
                 {uploadedFiles.map((file, index) => (
                   <div
