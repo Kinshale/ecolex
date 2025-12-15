@@ -46,7 +46,7 @@ export default function Dashboard() {
         <section className="py-16 px-6 md:px-8 lg:px-12 bg-muted/30">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">
-              Why Choose EnviroComply?
+              Why Choose EcoLex?
             </h2>
             <div className="grid gap-8 md:grid-cols-3">
               <div className="text-center">
@@ -89,10 +89,9 @@ export default function Dashboard() {
         <div className="max-w-5xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Leaf className="w-4 h-4 text-primary" />
-            <span>EnviroComply</span>
+            <span>EcoLex</span>
           </div>
-          <p>© 2024  EnviroComply
-        </p>
+          <p>© 2024 EcoLex</p>
         </div>
       </footer>
     </div>;
