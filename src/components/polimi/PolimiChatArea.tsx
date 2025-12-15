@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Sparkles, BookOpen, Loader2, FlaskConical, Ruler, Map, Scale, FileText, Globe } from 'lucide-react';
+import { Send, Sparkles, BookOpen, Loader2, Scale, FileText, Globe, Building, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
-import type { CourseConfig } from '@/pages/PolimiHub';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -24,50 +23,41 @@ interface QuickAction {
 }
 
 interface PolimiChatAreaProps {
-  course: CourseConfig | undefined;
+  degreeName: string | undefined;
   fileContents: string;
   hasFiles: boolean;
 }
 
-// Course-specific quick actions
-const QUICK_ACTIONS: Record<string, QuickAction[]> = {
-  'soil-remediation': [
-    {
-      label: '⚗️ Select Tech',
-      icon: <FlaskConical className="w-3.5 h-3.5" />,
-      action: 'Suggest the best remediation technology for a site contaminated by diesel in the unsaturated zone.'
-    },
-    {
-      label: '📐 Sizing',
-      icon: <Ruler className="w-3.5 h-3.5" />,
-      action: 'Help me dimension a Biopile system for 500 m³ of soil. What formulas should I use?'
-    },
-    {
-      label: '🗺️ Site Analysis',
-      icon: <Map className="w-3.5 h-3.5" />,
-      action: 'Analyze the pollutant distribution in the uploaded site map data.'
-    }
-  ],
-  'eia': [
-    {
-      label: '⚖️ Screening Check',
-      icon: <Scale className="w-3.5 h-3.5" />,
-      action: 'Does this project require a full EIA (VIA) or just a Screening according to D.Lgs 152/2006?'
-    },
-    {
-      label: '📄 SIA Content',
-      icon: <FileText className="w-3.5 h-3.5" />,
-      action: 'List the mandatory contents for the Environmental Impact Study (Studio di Impatto Ambientale).'
-    },
-    {
-      label: '🇪🇺 EU Compliance',
-      icon: <Globe className="w-3.5 h-3.5" />,
-      action: 'Check if the project complies with the "Do No Significant Harm" (DNSH) principle.'
-    }
-  ]
-};
+// Quick actions focused on regulatory topics
+const QUICK_ACTIONS: QuickAction[] = [
+  {
+    label: '⚖️ Normativa VIA',
+    icon: <Scale className="w-3.5 h-3.5" />,
+    action: 'Quali sono i contenuti obbligatori dello Studio di Impatto Ambientale secondo il D.Lgs 152/2006?'
+  },
+  {
+    label: '📄 D.Lgs 152/2006',
+    icon: <FileText className="w-3.5 h-3.5" />,
+    action: 'Spiega la struttura del Testo Unico Ambientale (D.Lgs 152/2006) e le sue parti principali.'
+  },
+  {
+    label: '🇪🇺 Direttive EU',
+    icon: <Globe className="w-3.5 h-3.5" />,
+    action: 'Quali sono le principali direttive europee in materia ambientale recepite in Italia?'
+  },
+  {
+    label: '🏗️ Edilizia',
+    icon: <Building className="w-3.5 h-3.5" />,
+    action: 'Quali autorizzazioni sono necessarie per un intervento edilizio secondo il DPR 380/2001?'
+  },
+  {
+    label: '🛡️ Sicurezza',
+    icon: <Shield className="w-3.5 h-3.5" />,
+    action: 'Cosa prevede la Direttiva Seveso III per gli stabilimenti a rischio di incidente rilevante?'
+  }
+];
 
-export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAreaProps) {
+export function PolimiChatArea({ degreeName, fileContents, hasFiles }: PolimiChatAreaProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -81,14 +71,14 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
     }
   }, [messages]);
 
-  // Reset chat when course changes
+  // Reset chat when degree changes
   useEffect(() => {
     setMessages([]);
     setInput('');
-  }, [course?.id]);
+  }, [degreeName]);
 
   const handleSubmit = useCallback(async () => {
-    if (!input.trim() || isLoading || !course) return;
+    if (!input.trim() || isLoading || !degreeName) return;
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
@@ -102,7 +92,7 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
 
     try {
       const contextPrefix = fileContents 
-        ? `\n\n--- UPLOADED COURSE MATERIALS ---\n${fileContents}\n--- END OF MATERIALS ---\n\nBased on the above course materials and your expertise, please answer the following question:\n\n`
+        ? `\n\n--- DOCUMENTI CARICATI ---\n${fileContents}\n--- FINE DOCUMENTI ---\n\nBasandoti sui documenti sopra e sulla tua competenza normativa, rispondi alla seguente domanda:\n\n`
         : '';
 
       const response = await supabase.functions.invoke('polimi-chat', {
@@ -110,8 +100,8 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
           messages: messages.map(m => ({ role: m.role, content: m.content })).concat([
             { role: 'user', content: contextPrefix + userMessage.content }
           ]),
-          systemPrompt: course.systemPrompt,
-          courseName: course.name,
+          systemPrompt: '',
+          courseName: degreeName,
         },
       });
 
@@ -122,7 +112,7 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: response.data?.content || 'Sorry, I could not generate a response.',
+        content: response.data?.content || 'Mi dispiace, non sono riuscito a generare una risposta.',
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -131,13 +121,13 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: 'Sorry, there was an error processing your request. Please try again.',
+        content: 'Si è verificato un errore. Per favore riprova.',
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, course, messages, fileContents]);
+  }, [input, isLoading, degreeName, messages, fileContents]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -151,15 +141,13 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
     textareaRef.current?.focus();
   }, []);
 
-  if (!course) {
+  if (!degreeName) {
     return (
       <div className="flex-1 flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Select a course to begin</p>
+        <p className="text-muted-foreground">Seleziona un corso di laurea per iniziare</p>
       </div>
     );
   }
-
-  const quickActions = QUICK_ACTIONS[course.id] || [];
 
   return (
     <main className="flex-1 flex flex-col bg-background">
@@ -169,9 +157,9 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
           <Sparkles className="w-4 h-4 text-primary" />
         </div>
         <div>
-          <h1 className="text-sm font-semibold">Chatting with: {course.name} Assistant</h1>
+          <h1 className="text-sm font-semibold">Assistente Normativo: {degreeName}</h1>
           <p className="text-[10px] text-muted-foreground">
-            {hasFiles ? 'Using your uploaded materials' : 'No course materials uploaded yet'}
+            {hasFiles ? 'Utilizzo i documenti caricati' : 'Nessun documento caricato'}
           </p>
         </div>
       </header>
@@ -181,9 +169,9 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.length === 0 ? (
             <EmptyState 
-              courseName={course.name} 
+              degreeName={degreeName} 
               hasFiles={hasFiles} 
-              quickActions={quickActions}
+              quickActions={QUICK_ACTIONS}
               onQuickAction={handleQuickAction}
             />
           ) : (
@@ -194,7 +182,7 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
           {isLoading && (
             <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm">Thinking...</span>
+              <span className="text-sm">Elaborazione in corso...</span>
             </div>
           )}
         </div>
@@ -204,21 +192,19 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
       <div className="border-t border-border p-4 bg-card/30">
         <div className="max-w-3xl mx-auto">
           {/* Quick Actions */}
-          {quickActions.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
-              {quickActions.map((qa, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs gap-1.5 hover:bg-primary/10 hover:border-primary/50"
-                  onClick={() => handleQuickAction(qa.action)}
-                >
-                  {qa.label}
-                </Button>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap gap-2 mb-3">
+            {QUICK_ACTIONS.map((qa, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs gap-1.5 hover:bg-primary/10 hover:border-primary/50"
+                onClick={() => handleQuickAction(qa.action)}
+              >
+                {qa.label}
+              </Button>
+            ))}
+          </div>
           
           <div className="relative flex items-end gap-2">
             <Textarea
@@ -226,7 +212,7 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={`Ask about ${course.name}...`}
+              placeholder="Chiedi informazioni su normative ambientali, urbanistiche, edilizie..."
               className="min-h-[44px] max-h-32 resize-none pr-12 bg-background"
               disabled={isLoading}
             />
@@ -240,7 +226,7 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground mt-2 text-center">
-            Press Enter to send, Shift+Enter for new line
+            Premi Invio per inviare, Shift+Invio per nuova riga
           </p>
         </div>
       </div>
@@ -249,24 +235,27 @@ export function PolimiChatArea({ course, fileContents, hasFiles }: PolimiChatAre
 }
 
 interface EmptyStateProps {
-  courseName: string;
+  degreeName: string;
   hasFiles: boolean;
   quickActions: QuickAction[];
   onQuickAction: (action: string) => void;
 }
 
-function EmptyState({ courseName, hasFiles, quickActions, onQuickAction }: EmptyStateProps) {
+function EmptyState({ degreeName, hasFiles, quickActions, onQuickAction }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 mb-6">
         <BookOpen className="w-10 h-10 text-primary" />
       </div>
-      <h2 className="text-lg font-semibold mb-2">Ready to help with {courseName}</h2>
-      <p className="text-muted-foreground text-sm max-w-md">
+      <h2 className="text-lg font-semibold mb-2">Assistente Normativo per {degreeName}</h2>
+      <p className="text-muted-foreground text-sm max-w-md mb-2">
         {hasFiles 
-          ? `I've loaded your course materials. Ask me anything about ${courseName}!`
-          : `Upload course documents or ask a question about ${courseName}.`
+          ? 'Ho caricato i tuoi documenti. Chiedimi informazioni su normative e regolamenti!'
+          : 'Carica documenti normativi o chiedimi informazioni su leggi ambientali, urbanistiche, edilizie e di sicurezza.'
         }
+      </p>
+      <p className="text-muted-foreground text-xs max-w-md">
+        Focus su: D.Lgs 152/2006 • Direttive EU • Regolamenti edilizi • Sicurezza industriale
       </p>
       {quickActions.length > 0 && (
         <div className="mt-6 flex flex-wrap justify-center gap-2">

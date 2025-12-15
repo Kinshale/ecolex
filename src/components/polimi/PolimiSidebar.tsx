@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { GraduationCap, BookOpen, Upload, X, FileText } from 'lucide-react';
+import { GraduationCap, Upload, X, FileText } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -9,10 +9,8 @@ import type { Degree } from '@/pages/PolimiHub';
 interface PolimiSidebarProps {
   degrees: Degree[];
   selectedDegreeId: string;
-  selectedCourseId: string;
   uploadedFiles: File[];
   onDegreeChange: (degreeId: string) => void;
-  onCourseChange: (courseId: string) => void;
   onFilesUpload: (files: File[]) => void;
   onRemoveFile: (index: number) => void;
 }
@@ -20,16 +18,12 @@ interface PolimiSidebarProps {
 export function PolimiSidebar({
   degrees,
   selectedDegreeId,
-  selectedCourseId,
   uploadedFiles,
   onDegreeChange,
-  onCourseChange,
   onFilesUpload,
   onRemoveFile,
 }: PolimiSidebarProps) {
   const [isDragOver, setIsDragOver] = useState(false);
-
-  const selectedDegree = degrees.find(d => d.id === selectedDegreeId);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -78,7 +72,7 @@ export function PolimiSidebar({
           </div>
           <h2 className="font-semibold text-sm">Polimi Student AI Hub</h2>
         </div>
-        <p className="text-xs text-muted-foreground">Select your degree and course</p>
+        <p className="text-xs text-muted-foreground">Assistente normativo per studenti Polimi</p>
       </div>
 
       <ScrollArea className="flex-1">
@@ -86,12 +80,12 @@ export function PolimiSidebar({
           {/* Degree Selector */}
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5" />
-              Master of Science Degree
+              <GraduationCap className="w-3.5 h-3.5" />
+              Corso di Laurea
             </label>
             <Select value={selectedDegreeId} onValueChange={onDegreeChange}>
               <SelectTrigger className="w-full bg-background text-sm h-9">
-                <SelectValue placeholder="Select degree" />
+                <SelectValue placeholder="Seleziona corso" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
                 {degrees.map(degree => (
@@ -107,38 +101,14 @@ export function PolimiSidebar({
             </Select>
           </div>
 
-          {/* Course Selector */}
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5" />
-              Course Module
-            </label>
-            <Select value={selectedCourseId} onValueChange={onCourseChange}>
-              <SelectTrigger className="w-full bg-background text-sm h-9">
-                <SelectValue placeholder="Select course" />
-              </SelectTrigger>
-              <SelectContent>
-                {selectedDegree?.courses.map(course => (
-                  <SelectItem 
-                    key={course.id} 
-                    value={course.id} 
-                    className="text-sm cursor-pointer"
-                  >
-                    {course.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Knowledge Base Upload */}
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
               <Upload className="w-3.5 h-3.5" />
-              Knowledge Base
+              Documenti di Riferimento
             </label>
             <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
-              Upload course slides or syllabus to train the AI assistant
+              Carica normative, regolamenti o documenti per contestualizzare le risposte
             </p>
             
             {/* Drop Zone */}
@@ -173,10 +143,10 @@ export function PolimiSidebar({
                 </div>
                 <div>
                   <p className="text-xs font-medium">
-                    {isDragOver ? "Drop files here" : "Drag & drop files"}
+                    {isDragOver ? "Rilascia qui" : "Trascina i file"}
                   </p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">
-                    PDF, TXT, MD supported
+                    PDF, TXT, MD supportati
                   </p>
                 </div>
               </div>
@@ -186,7 +156,7 @@ export function PolimiSidebar({
             {uploadedFiles.length > 0 && (
               <div className="space-y-1.5 mt-3">
                 <p className="text-[10px] text-muted-foreground font-medium">
-                  {uploadedFiles.length} file{uploadedFiles.length > 1 ? 's' : ''} uploaded
+                  {uploadedFiles.length} file caricati
                 </p>
                 {uploadedFiles.map((file, index) => (
                   <div
