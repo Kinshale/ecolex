@@ -1,16 +1,11 @@
-import { useState } from 'react';
-import { FilterState, RegulatoryScope } from '@/types';
 import { Header } from '@/components/Header';
 import { HistorySidebar } from '@/components/HistorySidebar';
 import { ComplianceUploader } from '@/components/ComplianceUploader';
-import { BottomFilterPanel } from '@/components/BottomFilterPanel';
+import { LawSelectionModal } from '@/components/law-selection';
+import { useLawSelectionStore } from '@/stores/lawSelectionStore';
 
 export default function DocumentAnalysis() {
-  const [filters, setFilters] = useState<FilterState>({
-    regulatoryScopes: ['european', 'national', 'lombardy'] as RegulatoryScope[],
-    areaOfInterest: null,
-    selectedNorms: [],
-  });
+  const { selectedLaws } = useLawSelectionStore();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -21,11 +16,12 @@ export default function DocumentAnalysis() {
         
         <main className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-auto">
-            <ComplianceUploader filters={filters} />
+            <ComplianceUploader selectedLaws={selectedLaws} />
           </div>
-          <BottomFilterPanel filters={filters} onFiltersChange={setFilters} />
         </main>
       </div>
+
+      <LawSelectionModal />
     </div>
   );
 }

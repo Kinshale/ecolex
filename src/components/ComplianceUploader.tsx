@@ -1,37 +1,39 @@
 import { useState, useCallback } from 'react';
-import { FilterState, ComplianceReport, Violation, Suggestion, REGULATORY_SCOPE_LABELS, AREA_OF_INTEREST_LABELS } from '@/types';
+import { ComplianceReport, Violation, Suggestion } from '@/types';
+import { Law } from '@/types/law';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { 
   Upload, 
   FileText, 
   CheckCircle2, 
   XCircle, 
   AlertTriangle, 
-  Loader2,
   FileUp,
   Lightbulb,
-  Scale
+  Scale,
+  BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useLawSelectionStore } from '@/stores/lawSelectionStore';
 
 interface ComplianceUploaderProps {
-  filters: FilterState;
+  selectedLaws: Law[];
 }
 
-export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
+export function ComplianceUploader({ selectedLaws }: ComplianceUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [report, setReport] = useState<ComplianceReport | null>(null);
   const { toast } = useToast();
+  const { openModal } = useLawSelectionStore();
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -82,13 +84,11 @@ export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
     setIsAnalyzing(true);
     setProgress(0);
 
-    // Simulate progress
     const progressInterval = setInterval(() => {
       setProgress(prev => Math.min(prev + 10, 90));
     }, 500);
 
     try {
-      // Read file content
       const reader = new FileReader();
       const fileContent = await new Promise<string>((resolve, reject) => {
         reader.onload = () => resolve(reader.result as string);
@@ -100,10 +100,12 @@ export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
         body: {
           fileName: file.name,
           fileContent,
-          filters: {
-            regulatoryScopes: filters.regulatoryScopes,
-            areaOfInterest: filters.areaOfInterest,
-          },
+          selectedLaws: selectedLaws.map(law => ({
+            id: law.id,
+            title: law.title,
+            short_name: law.short_name,
+            pdf_url: law.pdf_url,
+          })),
         },
       });
 
@@ -141,15 +143,33 @@ export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
             </div>
             <h2 className="text-2xl font-semibold mb-2">Compliance Analyzer</h2>
             <p className="text-muted-foreground">
-              Upload a document to check compliance against {filters.regulatoryScopes.length > 0 
-                ? filters.regulatoryScopes.map(s => REGULATORY_SCOPE_LABELS[s]).join(', ')
-                : 'all'} regulations
-              {filters.areaOfInterest && ` in ${AREA_OF_INTEREST_LABELS[filters.areaOfInterest]}`}
+              {selectedLaws.length > 0 
+                ? `Checking against ${selectedLaws.length} selected laws`
+                : 'Select laws to check compliance against'}
             </p>
+            {selectedLaws.length === 0 && (
+              <Button onClick={openModal} className="mt-4">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Select Laws
+              </Button>
+            )}
           </div>
 
+          {/* Selected Laws */}
+          {selectedLaws.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-center">
+              {selectedLaws.slice(0, 5).map((law) => (
+                <Badge key={law.id} variant="secondary">{law.short_name}</Badge>
+              ))}
+              {selectedLaws.length > 5 && (
+                <Badge variant="outline">+{selectedLaws.length - 5} more</Badge>
+              )}
+              <Button variant="ghost" size="sm" onClick={openModal}>Edit</Button>
+            </div>
+          )}
+
           {/* Upload Zone */}
-          {!file && (
+          {!file && selectedLaws.length > 0 && (
             <Card
               className={cn(
                 'border-2 border-dashed transition-all cursor-pointer animate-slide-up',
@@ -193,9 +213,7 @@ export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={resetUpload}>
-                    Change
-                  </Button>
+                  <Button variant="ghost" size="sm" onClick={resetUpload}>Change</Button>
                 </div>
 
                 {isAnalyzing ? (
@@ -205,9 +223,6 @@ export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
                       <span className="font-medium">{progress}%</span>
                     </div>
                     <Progress value={progress} className="h-2" />
-                    <p className="text-xs text-muted-foreground text-center">
-                      Checking against environmental regulations
-                    </p>
                   </div>
                 ) : (
                   <Button onClick={analyzeDocument} className="w-full" size="lg">
@@ -222,7 +237,6 @@ export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
           {/* Report */}
           {report && (
             <div className="space-y-4 animate-slide-up">
-              {/* Status Card */}
               <Card className={cn(
                 'border-2',
                 report.status === 'pass' ? 'border-success/50 bg-success/5' : 'border-destructive/50 bg-destructive/5'
@@ -245,19 +259,16 @@ export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
                       <p className="text-muted-foreground">{report.documentName}</p>
                     </div>
                   </div>
-                  {report.summary && (
-                    <p className="mt-4 text-sm text-muted-foreground">{report.summary}</p>
-                  )}
+                  {report.summary && <p className="mt-4 text-sm text-muted-foreground">{report.summary}</p>}
                 </CardContent>
               </Card>
 
-              {/* Violations */}
               {report.violations.length > 0 && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <AlertTriangle className="w-5 h-5 text-destructive" />
-                      Violations Found ({report.violations.length})
+                      Violations ({report.violations.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -268,13 +279,12 @@ export function ComplianceUploader({ filters }: ComplianceUploaderProps) {
                 </Card>
               )}
 
-              {/* Suggestions */}
               {report.suggestions.length > 0 && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Lightbulb className="w-5 h-5 text-accent" />
-                      Recommended Actions
+                      Recommendations
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -314,11 +324,6 @@ function ViolationItem({ violation }: { violation: Violation }) {
       <p className="text-xs text-muted-foreground">
         <span className="font-medium">Regulation:</span> {violation.regulation}
       </p>
-      {violation.location && (
-        <p className="text-xs text-muted-foreground">
-          <span className="font-medium">Location:</span> {violation.location}
-        </p>
-      )}
     </div>
   );
 }
@@ -328,9 +333,6 @@ function SuggestionItem({ suggestion }: { suggestion: Suggestion }) {
     <div className="p-4 rounded-lg bg-accent/5 border border-accent/10 space-y-2">
       <p className="font-medium text-sm">{suggestion.title}</p>
       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
-      <p className="text-xs text-muted-foreground">
-        <span className="font-medium">Related regulation:</span> {suggestion.regulation}
-      </p>
     </div>
   );
 }
