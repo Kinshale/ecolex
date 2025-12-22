@@ -1,32 +1,55 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChatMessage, FilterState, Citation } from '@/types';
+import { ChatMessage, Citation } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, FileText, Loader2 } from 'lucide-react';
+import { Send, Bot, User, FileText, Loader2, Scale, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useLawSelectionStore } from '@/stores/lawSelectionStore';
 
 interface ChatInterfaceProps {
-  filters: FilterState;
   conversationId?: string;
 }
 
-export function ChatInterface({ filters, conversationId }: ChatInterfaceProps) {
+export function ChatInterface({ conversationId }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  
+  const { selectedLaws, openModal, hasSelectedLawsForSession } = useLawSelectionStore();
+
+  // Auto-open modal when starting a new session without selected laws
+  useEffect(() => {
+    if (!hasSelectedLawsForSession && messages.length === 0) {
+      openModal();
+    }
+  }, [hasSelectedLawsForSession, messages.length, openModal]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Build system context from selected laws
+  const buildSystemContext = () => {
+    if (selectedLaws.length === 0) return '';
+    
+    const lawTitles = selectedLaws.map(law => law.title).join(', ');
+    const lawUrls = selectedLaws.map(law => `${law.short_name}: ${law.pdf_url}`).join('\n');
+    
+    return `The user is researching the following laws: ${lawTitles}. 
+Use these PDFs as your primary source of truth:
+${lawUrls}
+
+When answering, always cite the specific law and article when applicable.`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,16 +67,23 @@ export function ChatInterface({ filters, conversationId }: ChatInterfaceProps) {
     setIsLoading(true);
 
     try {
+      const systemContext = buildSystemContext();
+      
       const { data, error } = await supabase.functions.invoke('chat', {
         body: {
           messages: [...messages, userMessage].map(m => ({
             role: m.role,
             content: m.content,
           })),
-          filters: {
-            regulatoryScopes: filters.regulatoryScopes,
-            areaOfInterest: filters.areaOfInterest,
-          },
+          systemContext,
+          selectedLaws: selectedLaws.map(law => ({
+            id: law.id,
+            title: law.title,
+            short_name: law.short_name,
+            pdf_url: law.pdf_url,
+            jurisdiction: law.jurisdiction,
+            category: law.category,
+          })),
         },
       });
 
@@ -89,6 +119,29 @@ export function ChatInterface({ filters, conversationId }: ChatInterfaceProps) {
 
   return (
     <div className="flex flex-col h-full">
+      {/* Selected Laws Banner */}
+      {selectedLaws.length > 0 && (
+        <div className="border-b bg-muted/30 px-4 py-2 flex items-center gap-2 flex-shrink-0">
+          <Scale className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium">{selectedLaws.length} Laws Selected</span>
+          <div className="flex-1 flex gap-1 overflow-x-auto">
+            {selectedLaws.slice(0, 4).map((law) => (
+              <Badge key={law.id} variant="secondary" className="text-xs flex-shrink-0">
+                {law.short_name}
+              </Badge>
+            ))}
+            {selectedLaws.length > 4 && (
+              <Badge variant="outline" className="text-xs flex-shrink-0">
+                +{selectedLaws.length - 4}
+              </Badge>
+            )}
+          </div>
+          <Button variant="ghost" size="sm" onClick={openModal} className="flex-shrink-0">
+            Edit Selection
+          </Button>
+        </div>
+      )}
+
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         {messages.length === 0 ? (
@@ -98,9 +151,17 @@ export function ChatInterface({ filters, conversationId }: ChatInterfaceProps) {
                 <Bot className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Compliance Assistant</h3>
-              <p className="text-muted-foreground">
-                Ask questions about environmental regulations. I'll search through European, Italian, and Lombardy regional laws based on your active filters.
+              <p className="text-muted-foreground mb-4">
+                {selectedLaws.length > 0
+                  ? `You have ${selectedLaws.length} laws selected. Ask questions about these regulations.`
+                  : 'Select laws and regulations to start your consultation.'}
               </p>
+              {selectedLaws.length === 0 && (
+                <Button onClick={openModal}>
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Select Laws
+                </Button>
+              )}
             </div>
           </div>
         ) : (
@@ -128,26 +189,40 @@ export function ChatInterface({ filters, conversationId }: ChatInterfaceProps) {
       {/* Input Area */}
       <div className="border-t border-border p-4 bg-background">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <div className="relative">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask about environmental regulations..."
-              className="min-h-[56px] max-h-32 pr-14 resize-none bg-muted/30 border-border/50 focus:border-primary"
-              disabled={isLoading}
-            />
+          <div className="relative flex items-end gap-2">
             <Button
-              type="submit"
+              type="button"
+              variant="outline"
               size="icon"
-              className="absolute right-2 bottom-2"
-              disabled={!input.trim() || isLoading}
+              onClick={openModal}
+              className="flex-shrink-0 h-10 w-10"
+              title="Select Laws"
             >
-              <Send className="w-4 h-4" />
+              <Scale className="w-4 h-4" />
             </Button>
+            <div className="flex-1 relative">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask about environmental regulations..."
+                className="min-h-[56px] max-h-32 pr-14 resize-none bg-muted/30 border-border/50 focus:border-primary"
+                disabled={isLoading}
+              />
+              <Button
+                type="submit"
+                size="icon"
+                className="absolute right-2 bottom-2"
+                disabled={!input.trim() || isLoading}
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            Responses include citations from the filtered knowledge base
+            {selectedLaws.length > 0
+              ? `Consulting ${selectedLaws.length} selected laws`
+              : 'Select laws to get context-aware responses'}
           </p>
         </form>
       </div>
