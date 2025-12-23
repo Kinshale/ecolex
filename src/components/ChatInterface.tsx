@@ -10,9 +10,11 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLawSelectionStore } from '@/stores/lawSelectionStore';
+
 interface ChatInterfaceProps {
   conversationId?: string;
 }
+
 export function ChatInterface({
   conversationId
 }: ChatInterfaceProps) {
@@ -32,11 +34,13 @@ export function ChatInterface({
     resetSession
   } = useLawSelectionStore();
   const hasStartedChat = messages.length > 0;
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -51,6 +55,7 @@ export function ChatInterface({
       setUploadedDocument(file);
     }
   };
+
   const buildSystemContext = () => {
     if (selectedLaws.length === 0) return '';
     const lawTitles = selectedLaws.map(law => law.title).join(', ');
@@ -61,6 +66,7 @@ ${lawUrls}
 
 When answering, always cite the specific law and article when applicable.`;
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -115,12 +121,14 @@ When answering, always cite the specific law and article when applicable.`;
       setIsLoading(false);
     }
   };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
   };
+
   const handleNewChat = () => {
     setMessages([]);
     resetSession();
@@ -131,7 +139,8 @@ When answering, always cite the specific law and article when applicable.`;
 
   // Initial centered view
   if (!hasStartedChat) {
-    return <div className="flex flex-col h-full">
+    return (
+      <div className="flex flex-col h-full">
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="w-full max-w-2xl animate-fade-in">
             {/* Logo/Title */}
@@ -147,8 +156,21 @@ When answering, always cite the specific law and article when applicable.`;
 
             {/* Input Area */}
             <div className="relative mb-6">
-              <Textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Ask about environmental regulations..." className="min-h-[80px] pr-14 resize-none bg-muted/30 border-border/50 focus:border-primary text-base" disabled={isLoading} />
-              <Button type="button" size="icon" className="absolute right-3 bottom-3" disabled={!input.trim() || isLoading} onClick={handleSubmit}>
+              <Textarea 
+                value={input} 
+                onChange={e => setInput(e.target.value)} 
+                onKeyDown={handleKeyDown} 
+                placeholder="Ask about environmental regulations..." 
+                className="min-h-[80px] pr-14 resize-none bg-muted/30 border-border/50 focus:border-primary text-base" 
+                disabled={isLoading} 
+              />
+              <Button 
+                type="button" 
+                size="icon" 
+                className="absolute right-3 bottom-3" 
+                disabled={!input.trim() || isLoading} 
+                onClick={handleSubmit}
+              >
                 <Send className="w-4 h-4" />
               </Button>
             </div>
@@ -156,75 +178,81 @@ When answering, always cite the specific law and article when applicable.`;
             {/* Action Buttons */}
             <div className="flex items-center justify-center gap-3 mb-8">
               {/* Select Laws Button */}
-              <Button variant={selectedLaws.length > 0 ? 'secondary' : 'outline'} className="gap-2" onClick={openModal}>
+              <Button 
+                variant={selectedLaws.length > 0 ? 'secondary' : 'outline'} 
+                className="gap-2" 
+                onClick={openModal}
+              >
                 <Scale className="w-4 h-4" />
-                {selectedLaws.length > 0 ? <span className="flex items-center gap-2">
+                {selectedLaws.length > 0 ? (
+                  <span className="flex items-center gap-2">
                     {selectedLaws.length} Laws Selected
-                    <button onClick={e => {
-                  e.stopPropagation();
-                  useLawSelectionStore.getState().clearSelection();
-                }} className="p-0.5 rounded-full hover:bg-muted">
+                    <button 
+                      onClick={e => {
+                        e.stopPropagation();
+                        useLawSelectionStore.getState().clearSelection();
+                      }} 
+                      className="p-0.5 rounded-full hover:bg-muted"
+                    >
                       <X className="w-3 h-3" />
                     </button>
-                  </span> : 'Select Laws'}
+                  </span>
+                ) : 'Select Laws'}
               </Button>
 
               {/* Upload PDF Button */}
-              <Button variant={uploadedDocument ? 'secondary' : 'outline'} className="gap-2" onClick={() => fileInputRef.current?.click()}>
-                {uploadedDocument ? <>
+              <Button 
+                variant={uploadedDocument ? 'secondary' : 'outline'} 
+                className="gap-2" 
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {uploadedDocument ? (
+                  <>
                     <FileCheck className="w-4 h-4" />
                     <span className="truncate max-w-[150px]">{uploadedDocument.name}</span>
-                    <button onClick={e => {
-                  e.stopPropagation();
-                  setUploadedDocument(null);
-                }} className="p-0.5 rounded-full hover:bg-muted">
+                    <button 
+                      onClick={e => {
+                        e.stopPropagation();
+                        setUploadedDocument(null);
+                      }} 
+                      className="p-0.5 rounded-full hover:bg-muted"
+                    >
                       <X className="w-3 h-3" />
                     </button>
-                  </> : <>
+                  </>
+                ) : (
+                  <>
                     <Upload className="w-4 h-4" />
                     Upload PDF
-                  </>}
+                  </>
+                )}
               </Button>
-              <input ref={fileInputRef} type="file" accept=".pdf" className="hidden" onChange={handleFileUpload} />
+              <input 
+                ref={fileInputRef} 
+                type="file" 
+                accept=".pdf" 
+                className="hidden" 
+                onChange={handleFileUpload} 
+              />
             </div>
-
-            {/* Template Suggestions */}
-            
           </div>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Chat view with messages
-  return <div className="flex flex-col h-full">
-      {/* Header with selection summary */}
-      <div className="border-b bg-muted/30 px-4 py-2 flex items-center gap-3 flex-shrink-0">
-        <Button variant="ghost" size="sm" onClick={handleNewChat} className="gap-2">
-          <Plus className="w-4 h-4" />
-          New Chat
-        </Button>
-        
-        <div className="h-4 w-px bg-border" />
-        
-        {selectedLaws.length > 0 && <div className="flex items-center gap-2">
-            <Scale className="w-4 h-4 text-primary" />
-            <span className="text-sm">{selectedLaws.length} Laws</span>
-            <Button variant="ghost" size="sm" onClick={openModal} className="h-6 px-2 text-xs">
-              Edit
-            </Button>
-          </div>}
-        
-        {uploadedDocument && <div className="flex items-center gap-2">
-            <FileCheck className="w-4 h-4 text-primary" />
-            <span className="text-sm truncate max-w-[120px]">{uploadedDocument.name}</span>
-          </div>}
-      </div>
+  return (
+    <div className="flex flex-col h-full">
 
       {/* Messages Area */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4 max-w-3xl mx-auto">
-          {messages.map(message => <MessageBubble key={message.id} message={message} />)}
-          {isLoading && <div className="flex gap-3 animate-fade-in">
+      <ScrollArea className="flex-1 p-4 pb-32" ref={scrollRef}>
+        <div className="space-y-4 max-w-4xl mx-auto">
+          {messages.map(message => (
+            <MessageBubble key={message.id} message={message} />
+          ))}
+          {isLoading && (
+            <div className="flex gap-3 animate-fade-in">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Bot className="w-4 h-4 text-primary" />
               </div>
@@ -234,35 +262,101 @@ When answering, always cite the specific law and article when applicable.`;
                   <span>Searching regulations...</span>
                 </div>
               </Card>
-            </div>}
+            </div>
+          )}
         </div>
       </ScrollArea>
 
-      {/* Input Area - Fixed at bottom */}
-      <div className="border-t border-border p-4 bg-background">
-        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <div className="relative flex items-end gap-2">
-            <Button type="button" variant="outline" size="icon" onClick={openModal} className="flex-shrink-0 h-10 w-10" title="Select Laws">
-              <Scale className="w-4 h-4" />
-            </Button>
-            <div className="flex-1 relative">
-              <Textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Ask about environmental regulations..." className="min-h-[56px] max-h-32 pr-14 resize-none bg-muted/30 border-border/50 focus:border-primary" disabled={isLoading} />
-              <Button type="submit" size="icon" className="absolute right-2 bottom-2" disabled={!input.trim() || isLoading}>
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
+      {/* Input Area - Floating at bottom */}
+      <div className="absolute bottom-4 left-4 right-4 flex justify-center">
+        <div className="w-full max-w-3xl">
+          <div className="bg-background border rounded-2xl shadow-lg p-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+              {/* Auto-resizing textarea */}
+              <textarea
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = Math.min(target.scrollHeight, 192) + 'px'; // max 192px (12rem)
+                }}
+                placeholder="Ask about environmental regulations..."
+                className="min-h-[42px] max-h-48 resize-none bg-background border-0 rounded-lg px-3 py-2 text-base focus:outline-none overflow-hidden"
+                disabled={isLoading}
+                rows={1}
+              />
+              {/* Button row below textarea */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {/* Laws Selection Button */}
+                  <Button
+                    type="button"
+                    variant={selectedLaws.length > 0 ? "secondary" : "outline"}
+                    size="sm"
+                    onClick={openModal}
+                    className="h-10 gap-2"
+                    title="Select Laws"
+                  >
+                    <Scale className="w-4 h-4" />
+                    {selectedLaws.length > 0 ? (
+                      <span className="text-xs">{selectedLaws.length} Laws</span>
+                    ) : (
+                      <span className="text-xs">Laws</span>
+                    )}
+                  </Button>
+                  
+                  {/* Document Upload Button */}
+                  <Button
+                    type="button"
+                    variant={uploadedDocument ? "secondary" : "outline"}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="h-10 gap-2"
+                    title="Upload Document"
+                  >
+                    {uploadedDocument ? <FileCheck className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
+                    {uploadedDocument ? (
+                      <span className="text-xs truncate max-w-[80px]">{uploadedDocument.name}</span>
+                    ) : (
+                      <span className="text-xs">Upload</span>
+                    )}
+                  </Button>
+                  
+                  <input 
+                    ref={fileInputRef} 
+                    type="file" 
+                    accept=".pdf" 
+                    className="hidden" 
+                    onChange={handleFileUpload} 
+                  />
+                </div>
+                
+                <Button
+                  type="submit"
+                  className="h-10 w-10"
+                  disabled={!input.trim() || isLoading}
+                  title="Send"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
-    </div>;
+    </div>
+  );
 }
+
 function MessageBubble({
   message
 }: {
   message: ChatMessage;
 }) {
   const isUser = message.role === 'user';
-  return <div className={cn('flex gap-3 chat-message', isUser && 'flex-row-reverse')}>
+  return (
+    <div className={cn('flex gap-3 chat-message', isUser && 'flex-row-reverse')}>
       <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0', isUser ? 'bg-accent/20' : 'bg-primary/10')}>
         {isUser ? <User className="w-4 h-4 text-accent" /> : <Bot className="w-4 h-4 text-primary" />}
       </div>
@@ -275,23 +369,31 @@ function MessageBubble({
         </Card>
 
         {/* Citations */}
-        {message.citations && message.citations.length > 0 && <div className="space-y-2">
+        {message.citations && message.citations.length > 0 && (
+          <div className="space-y-2">
             <p className="text-xs text-muted-foreground font-medium">Sources:</p>
             <div className="flex flex-wrap gap-2">
-              {message.citations.map((citation, idx) => <CitationBadge key={idx} citation={citation} />)}
+              {message.citations.map((citation, idx) => (
+                <CitationBadge key={idx} citation={citation} />
+              ))}
             </div>
-          </div>}
+          </div>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 }
+
 function CitationBadge({
   citation
 }: {
   citation: Citation;
 }) {
-  return <Badge variant="outline" className="text-xs py-1 px-2 bg-background hover:bg-muted cursor-pointer transition-colors">
+  return (
+    <Badge variant="outline" className="text-xs py-1 px-2 bg-background hover:bg-muted cursor-pointer transition-colors">
       <FileText className="w-3 h-3 mr-1" />
       {citation.documentTitle}
       <span className="ml-1 text-muted-foreground">({citation.regulatoryScope})</span>
-    </Badge>;
+    </Badge>
+  );
 }
