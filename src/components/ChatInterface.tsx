@@ -5,7 +5,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, FileText, Loader2, Scale, BookOpen } from 'lucide-react';
+import { 
+  Send, 
+  Bot, 
+  User, 
+  FileText, 
+  Loader2, 
+  Scale, 
+  Upload, 
+  FileCheck,
+  X,
+  Plus,
+  Sparkles
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -20,16 +32,18 @@ export function ChatInterface({ conversationId }: ChatInterfaceProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
-  const { selectedLaws, openModal, hasSelectedLawsForSession } = useLawSelectionStore();
+  const { 
+    selectedLaws, 
+    openModal, 
+    uploadedDocument, 
+    setUploadedDocument,
+    resetSession 
+  } = useLawSelectionStore();
 
-  // Auto-open modal when starting a new session without selected laws
-  useEffect(() => {
-    if (!hasSelectedLawsForSession && messages.length === 0) {
-      openModal();
-    }
-  }, [hasSelectedLawsForSession, messages.length, openModal]);
+  const hasStartedChat = messages.length > 0;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -37,7 +51,21 @@ export function ChatInterface({ conversationId }: ChatInterfaceProps) {
     }
   }, [messages]);
 
-  // Build system context from selected laws
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        toast({
+          title: 'Invalid file type',
+          description: 'Please upload a PDF document.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      setUploadedDocument(file);
+    }
+  };
+
   const buildSystemContext = () => {
     if (selectedLaws.length === 0) return '';
     
@@ -117,76 +145,196 @@ When answering, always cite the specific law and article when applicable.`;
     }
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+    resetSession();
+  };
+
+  // Template prompts
+  const templates = [
+    "What are the main requirements of this regulation?",
+    "Summarize the key compliance obligations",
+    "What are the penalties for non-compliance?",
+    "Compare these regulations' approaches to environmental protection",
+  ];
+
+  // Initial centered view
+  if (!hasStartedChat) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-2xl animate-fade-in">
+            {/* Logo/Title */}
+            <div className="text-center mb-8">
+              <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                <Sparkles className="w-8 h-8 text-primary" />
+              </div>
+              <h1 className="text-2xl font-semibold mb-2">Environmental Law Assistant</h1>
+              <p className="text-muted-foreground">
+                Select laws and upload documents to get context-aware compliance insights.
+              </p>
+            </div>
+
+            {/* Input Area */}
+            <div className="relative mb-6">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask about environmental regulations..."
+                className="min-h-[80px] pr-14 resize-none bg-muted/30 border-border/50 focus:border-primary text-base"
+                disabled={isLoading}
+              />
+              <Button
+                type="button"
+                size="icon"
+                className="absolute right-3 bottom-3"
+                disabled={!input.trim() || isLoading}
+                onClick={handleSubmit}
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-center gap-3 mb-8">
+              {/* Select Laws Button */}
+              <Button
+                variant={selectedLaws.length > 0 ? 'secondary' : 'outline'}
+                className="gap-2"
+                onClick={openModal}
+              >
+                <Scale className="w-4 h-4" />
+                {selectedLaws.length > 0 ? (
+                  <span className="flex items-center gap-2">
+                    {selectedLaws.length} Laws Selected
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        useLawSelectionStore.getState().clearSelection();
+                      }}
+                      className="p-0.5 rounded-full hover:bg-muted"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ) : (
+                  'Select Laws'
+                )}
+              </Button>
+
+              {/* Upload PDF Button */}
+              <Button
+                variant={uploadedDocument ? 'secondary' : 'outline'}
+                className="gap-2"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {uploadedDocument ? (
+                  <>
+                    <FileCheck className="w-4 h-4" />
+                    <span className="truncate max-w-[150px]">{uploadedDocument.name}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setUploadedDocument(null);
+                      }}
+                      className="p-0.5 rounded-full hover:bg-muted"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Upload PDF
+                  </>
+                )}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+            </div>
+
+            {/* Template Suggestions */}
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground text-center mb-3">Quick prompts</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {templates.map((template, idx) => (
+                  <Button
+                    key={idx}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => setInput(template)}
+                  >
+                    {template}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Chat view with messages
   return (
     <div className="flex flex-col h-full">
-      {/* Selected Laws Banner */}
-      {selectedLaws.length > 0 && (
-        <div className="border-b bg-muted/30 px-4 py-2 flex items-center gap-2 flex-shrink-0">
-          <Scale className="w-4 h-4 text-primary" />
-          <span className="text-sm font-medium">{selectedLaws.length} Laws Selected</span>
-          <div className="flex-1 flex gap-1 overflow-x-auto">
-            {selectedLaws.slice(0, 4).map((law) => (
-              <Badge key={law.id} variant="secondary" className="text-xs flex-shrink-0">
-                {law.short_name}
-              </Badge>
-            ))}
-            {selectedLaws.length > 4 && (
-              <Badge variant="outline" className="text-xs flex-shrink-0">
-                +{selectedLaws.length - 4}
-              </Badge>
-            )}
+      {/* Header with selection summary */}
+      <div className="border-b bg-muted/30 px-4 py-2 flex items-center gap-3 flex-shrink-0">
+        <Button variant="ghost" size="sm" onClick={handleNewChat} className="gap-2">
+          <Plus className="w-4 h-4" />
+          New Chat
+        </Button>
+        
+        <div className="h-4 w-px bg-border" />
+        
+        {selectedLaws.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Scale className="w-4 h-4 text-primary" />
+            <span className="text-sm">{selectedLaws.length} Laws</span>
+            <Button variant="ghost" size="sm" onClick={openModal} className="h-6 px-2 text-xs">
+              Edit
+            </Button>
           </div>
-          <Button variant="ghost" size="sm" onClick={openModal} className="flex-shrink-0">
-            Edit Selection
-          </Button>
-        </div>
-      )}
+        )}
+        
+        {uploadedDocument && (
+          <div className="flex items-center gap-2">
+            <FileCheck className="w-4 h-4 text-primary" />
+            <span className="text-sm truncate max-w-[120px]">{uploadedDocument.name}</span>
+          </div>
+        )}
+      </div>
 
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        {messages.length === 0 ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center max-w-md animate-fade-in">
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-                <Bot className="w-8 h-8 text-primary" />
+        <div className="space-y-4 max-w-3xl mx-auto">
+          {messages.map((message) => (
+            <MessageBubble key={message.id} message={message} />
+          ))}
+          {isLoading && (
+            <div className="flex gap-3 animate-fade-in">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-4 h-4 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Compliance Assistant</h3>
-              <p className="text-muted-foreground mb-4">
-                {selectedLaws.length > 0
-                  ? `You have ${selectedLaws.length} laws selected. Ask questions about these regulations.`
-                  : 'Select laws and regulations to start your consultation.'}
-              </p>
-              {selectedLaws.length === 0 && (
-                <Button onClick={openModal}>
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  Select Laws
-                </Button>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4 max-w-3xl mx-auto">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-            {isLoading && (
-              <div className="flex gap-3 animate-fade-in">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-primary" />
+              <Card className="p-4 bg-muted/50 border-0">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Searching regulations...</span>
                 </div>
-                <Card className="p-4 bg-muted/50 border-0">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Searching regulations...</span>
-                  </div>
-                </Card>
-              </div>
-            )}
-          </div>
-        )}
+              </Card>
+            </div>
+          )}
+        </div>
       </ScrollArea>
 
-      {/* Input Area */}
+      {/* Input Area - Fixed at bottom */}
       <div className="border-t border-border p-4 bg-background">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
           <div className="relative flex items-end gap-2">
@@ -219,11 +367,6 @@ When answering, always cite the specific law and article when applicable.`;
               </Button>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            {selectedLaws.length > 0
-              ? `Consulting ${selectedLaws.length} selected laws`
-              : 'Select laws to get context-aware responses'}
-          </p>
         </form>
       </div>
     </div>

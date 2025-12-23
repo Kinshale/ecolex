@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Search, Grid3X3, List, RotateCcw, Globe, Flag, MapPin } from 'lucide-react';
 import {
   Dialog,
@@ -67,7 +66,7 @@ export function LawSelectionModal() {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
-      <DialogContent className="max-w-5xl h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent className="max-w-5xl h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
           <DialogTitle className="text-xl font-semibold">
             Select Laws & Regulations
@@ -163,7 +162,7 @@ export function LawSelectionModal() {
 
         {/* Laws Grid/List */}
         <ScrollArea className="flex-1 px-6">
-          <div className="py-4 pb-24">
+          <div className={cn('py-4', selectedLaws.length > 0 && 'pb-24')}>
             {isLoading ? (
               <div
                 className={cn(
@@ -212,12 +211,9 @@ export function LawSelectionModal() {
           </div>
         </ScrollArea>
 
-        {/* Selection Dock */}
+        {/* Selection Dock - Full Width at bottom */}
         {selectedLaws.length > 0 && (
-          <SelectionDock
-            onConfirm={confirmSelection}
-            className="absolute bottom-4 left-4 right-4 mx-0 translate-x-0 static"
-          />
+          <SelectionDock onConfirm={confirmSelection} variant="modal" />
         )}
       </DialogContent>
     </Dialog>
