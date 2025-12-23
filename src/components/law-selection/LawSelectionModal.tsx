@@ -162,12 +162,12 @@ export function LawSelectionModal() {
 
         {/* Laws Grid/List */}
         <ScrollArea className="flex-1 px-6">
-          <div className={cn('py-4', selectedLaws.length > 0 && 'pb-24')}>
+          <div className={cn('py-4 px-2 overflow-visible', selectedLaws.length > 0 && 'pb-24')}>
             {isLoading ? (
               <div
                 className={cn(
                   viewMode === 'grid'
-                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'
+                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible'
                     : 'space-y-2'
                 )}
               >

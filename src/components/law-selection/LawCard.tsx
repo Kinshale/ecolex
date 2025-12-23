@@ -38,7 +38,7 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
   };
 
   const InfoTooltip = () => (
-    <TooltipProvider delayDuration={300}>
+    <TooltipProvider delayDuration={200}>
       <Tooltip>
         <TooltipTrigger asChild>
           <button
@@ -73,8 +73,8 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
       <div
         className={cn(
           'flex items-center gap-4 p-3 rounded-lg border transition-colors cursor-pointer',
-          isSelected 
-            ? 'bg-primary/5 border-primary/30' 
+          isSelected
+            ? 'bg-primary/5 border-primary/30'
             : 'hover:bg-muted/30'
         )}
         onClick={onToggle}
@@ -83,16 +83,16 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
           checked={isSelected}
           className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
         />
-        
+
         <div className="flex-1 min-w-0">
           <button
             onClick={handleTitleClick}
             className="text-sm font-medium hover:text-primary hover:underline text-left truncate block w-full"
           >
-            {law.title}
+            {law.short_name}
             <ExternalLink className="w-3 h-3 inline ml-1 opacity-50" />
           </button>
-          <p className="text-xs text-muted-foreground truncate">{law.short_name}</p>
+          <p className="text-xs text-muted-foreground truncate">{law.title}</p>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -116,8 +116,8 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
     <Card
       className={cn(
         'relative p-4 cursor-pointer transition-colors',
-        isSelected 
-          ? 'ring-2 ring-primary bg-primary/5' 
+        isSelected
+          ? 'ring-2 ring-primary bg-primary/5'
           : 'hover:bg-muted/30'
       )}
       onClick={onToggle}
@@ -141,32 +141,33 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
         <InfoTooltip />
       </div>
 
-      <div className="mt-6 space-y-3">
-        {/* Badges row */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <Badge variant="outline" className={cn('text-xs', jurisdictionColors[law.jurisdiction])}>
-            {law.jurisdiction}
-          </Badge>
-          <Badge variant="secondary" className="text-xs">
-            {law.category}
-          </Badge>
-          <Badge variant="secondary" className={cn('text-xs', statusColors[law.status])}>
-            {law.status}
-          </Badge>
-        </div>
-
+      <div className="mt-6 mb-4 space-y-3">
         {/* Title */}
         <div>
           <button
             onClick={handleTitleClick}
             className="text-sm font-semibold hover:text-primary hover:underline text-left"
           >
-            {law.title}
+            {law.short_name}
             <ExternalLink className="w-3 h-3 inline ml-1 opacity-50" />
           </button>
-          <p className="text-xs text-muted-foreground mt-1">{law.short_name}</p>
+          <p className="text-xs text-muted-foreground mt-1">{law.title}</p>
         </div>
       </div>
+
+      {/* Badges row */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <Badge variant="outline" className={cn('text-xs', jurisdictionColors[law.jurisdiction])}>
+          {law.jurisdiction}
+        </Badge>
+        <Badge variant="secondary" className="text-xs">
+          {law.category}
+        </Badge>
+        <Badge variant="secondary" className={cn('text-xs', statusColors[law.status])}>
+          {law.status}
+        </Badge>
+      </div>
+
     </Card>
   );
 }
