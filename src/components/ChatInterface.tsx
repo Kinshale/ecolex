@@ -140,102 +140,98 @@ When answering, always cite the specific law and article when applicable.`;
   // Initial centered view
   if (!hasStartedChat) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl animate-fade-in">
-            {/* Logo/Title */}
-            <div className="text-center mb-8">
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-                <Sparkles className="w-8 h-8 text-primary" />
-              </div>
-              <h1 className="text-2xl font-semibold mb-2">Environmental Law Assistant</h1>
-              <p className="text-muted-foreground">
-                Select laws and upload documents to get context-aware compliance insights.
-              </p>
-            </div>
-
-            {/* Input Area */}
-            <div className="relative mb-6">
-              <Textarea 
-                value={input} 
-                onChange={e => setInput(e.target.value)} 
-                onKeyDown={handleKeyDown} 
-                placeholder="Ask about environmental regulations..." 
-                className="min-h-[80px] pr-14 resize-none bg-muted/30 border-border/50 focus:border-primary text-base" 
-                disabled={isLoading} 
-              />
-              <Button 
-                type="button" 
-                size="icon" 
-                className="absolute right-3 bottom-3" 
-                disabled={!input.trim() || isLoading} 
-                onClick={handleSubmit}
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-center gap-3 mb-8">
-              {/* Select Laws Button */}
-              <Button 
-                variant={selectedLaws.length > 0 ? 'secondary' : 'outline'} 
-                className="gap-2" 
-                onClick={openModal}
-              >
-                <Scale className="w-4 h-4" />
-                {selectedLaws.length > 0 ? (
-                  <span className="flex items-center gap-2">
-                    {selectedLaws.length} Laws Selected
-                    <button 
-                      onClick={e => {
-                        e.stopPropagation();
-                        useLawSelectionStore.getState().clearSelection();
-                      }} 
-                      className="p-0.5 rounded-full hover:bg-muted"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ) : 'Select Laws'}
-              </Button>
-
-              {/* Upload PDF Button */}
-              <Button 
-                variant={uploadedDocument ? 'secondary' : 'outline'} 
-                className="gap-2" 
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {uploadedDocument ? (
-                  <>
-                    <FileCheck className="w-4 h-4" />
-                    <span className="truncate max-w-[150px]">{uploadedDocument.name}</span>
-                    <button 
-                      onClick={e => {
-                        e.stopPropagation();
-                        setUploadedDocument(null);
-                      }} 
-                      className="p-0.5 rounded-full hover:bg-muted"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4" />
-                    Upload PDF
-                  </>
-                )}
-              </Button>
-              <input 
-                ref={fileInputRef} 
-                type="file" 
-                accept=".pdf" 
-                className="hidden" 
-                onChange={handleFileUpload} 
-              />
-            </div>
+      <div className="flex flex-col items-center justify-center space-y-8 h-full">
+        {/* Logo/Title */}
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Sparkles className="w-8 h-8 text-primary" />
           </div>
+          <h1 className="text-4xl font-bold">Environmental Law Assistant</h1>
+          <p className="text-muted-foreground text-base">
+            Select laws and upload documents to get context-aware compliance insights.
+          </p>
+        </div>
+
+        {/* Input Area */}
+        <div className="relative w-full max-w-lg">
+          <Textarea
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask about environmental regulations..."
+            className="min-h-[32px] pr-14 resize-none bg-muted/30 border-border/50 focus:border-primary text-base rounded-lg"
+            disabled={isLoading}
+          />
+          <Button
+            type="button"
+            size="icon"
+            className="absolute right-3 bottom-3"
+            disabled={!input.trim() || isLoading}
+            onClick={handleSubmit}
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-center gap-4">
+          {/* Select Laws Button */}
+          <Button
+            variant={selectedLaws.length > 0 ? 'secondary' : 'outline'}
+            className="gap-2 px-4 py-2"
+            onClick={openModal}
+          >
+            <Scale className="w-4 h-4" />
+            {selectedLaws.length > 0 ? (
+              <span className="flex items-center gap-2">
+                {selectedLaws.length} Laws Selected
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    useLawSelectionStore.getState().clearSelection();
+                  }}
+                  className="p-0.5 rounded-full hover:bg-muted"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ) : 'Select Laws'}
+          </Button>
+
+          {/* Upload PDF Button */}
+          <Button
+            variant={uploadedDocument ? 'secondary' : 'outline'}
+            className="gap-2 px-4 py-2"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {uploadedDocument ? (
+              <>
+                <FileCheck className="w-4 h-4" />
+                <span className="truncate max-w-[150px]">{uploadedDocument.name}</span>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setUploadedDocument(null);
+                  }}
+                  className="p-0.5 rounded-full hover:bg-muted"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4" />
+                Upload PDF
+              </>
+            )}
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
         </div>
       </div>
     );
@@ -306,7 +302,7 @@ When answering, always cite the specific law and article when applicable.`;
                       <span className="text-xs">Laws</span>
                     )}
                   </Button>
-                  
+
                   {/* Document Upload Button */}
                   <Button
                     type="button"
@@ -315,23 +311,38 @@ When answering, always cite the specific law and article when applicable.`;
                     className="h-10 gap-2"
                     title="Upload Document"
                   >
-                    {uploadedDocument ? <FileCheck className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
                     {uploadedDocument ? (
-                      <span className="text-xs truncate max-w-[80px]">{uploadedDocument.name}</span>
+                      <>
+                        <FileCheck className="w-4 h-4" />
+                        <span className="text-xs truncate max-w-[80px]">{uploadedDocument.name}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setUploadedDocument(null);
+                          }}
+                          className="p-0.5 rounded-full hover:bg-muted"
+                          title="Remove Document"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </>
                     ) : (
-                      <span className="text-xs">Upload</span>
+                      <>
+                        <Upload className="w-4 h-4" />
+                        <span className="text-xs">Upload</span>
+                      </>
                     )}
                   </Button>
-                  
-                  <input 
-                    ref={fileInputRef} 
-                    type="file" 
-                    accept=".pdf" 
-                    className="hidden" 
-                    onChange={handleFileUpload} 
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    onChange={handleFileUpload}
                   />
                 </div>
-                
+
                 <Button
                   type="submit"
                   className="h-10 w-10"
