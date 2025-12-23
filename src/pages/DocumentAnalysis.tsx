@@ -8,7 +8,7 @@ export default function DocumentAnalysis() {
   const { selectedLaws } = useLawSelectionStore();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col">
       <Header />
       
       <div className="flex-1 flex overflow-hidden">

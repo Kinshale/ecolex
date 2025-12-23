@@ -98,7 +98,7 @@ export default function PolimiHub() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col">
       <Header />
       
       <div className="flex-1 flex overflow-hidden">
