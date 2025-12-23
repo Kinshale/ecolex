@@ -37,12 +37,45 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
     window.open(law.pdf_url, '_blank');
   };
 
+  const InfoTooltip = () => (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            className="p-1 rounded hover:bg-muted flex-shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Info className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="left" className="max-w-sm z-[250]">
+          <div className="space-y-2">
+            <p className="font-medium">{law.title}</p>
+            <p className="text-sm text-muted-foreground">{law.summary}</p>
+            <div className="flex flex-wrap gap-1">
+              {law.tags.map((tag) => (
+                <Badge key={tag} variant="outline" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Published: {format(new Date(law.publication_date), 'PPP')}
+            </p>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+
   if (viewMode === 'list') {
     return (
       <div
         className={cn(
-          'flex items-center gap-4 p-3 rounded-lg border transition-all cursor-pointer hover:bg-muted/50',
-          isSelected && 'bg-primary/5 border-primary/30'
+          'flex items-center gap-4 p-3 rounded-lg border transition-colors cursor-pointer',
+          isSelected 
+            ? 'bg-primary/5 border-primary/30' 
+            : 'hover:bg-muted/30'
         )}
         onClick={onToggle}
       >
@@ -56,32 +89,36 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
             onClick={handleTitleClick}
             className="text-sm font-medium hover:text-primary hover:underline text-left truncate block w-full"
           >
-            {law.short_name}
+            {law.title}
             <ExternalLink className="w-3 h-3 inline ml-1 opacity-50" />
           </button>
-          <p className="text-xs text-muted-foreground truncate">{law.title}</p>
+          <p className="text-xs text-muted-foreground truncate">{law.short_name}</p>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
           <Badge variant="outline" className={cn('text-xs', jurisdictionColors[law.jurisdiction])}>
             {law.jurisdiction}
           </Badge>
+          <Badge variant="secondary" className="text-xs">
+            {law.category}
+          </Badge>
           <Badge variant="secondary" className={cn('text-xs', statusColors[law.status])}>
             {law.status}
           </Badge>
-          <span className="text-xs text-muted-foreground hidden sm:block">
-            {format(new Date(law.publication_date), 'yyyy')}
-          </span>
+          <InfoTooltip />
         </div>
       </div>
     );
   }
 
+  // Grid view
   return (
     <Card
       className={cn(
-        'relative p-4 cursor-pointer transition-all hover:shadow-md group',
-        isSelected && 'ring-2 ring-primary bg-primary/5'
+        'relative p-4 cursor-pointer transition-colors',
+        isSelected 
+          ? 'ring-2 ring-primary bg-primary/5' 
+          : 'hover:bg-muted/30'
       )}
       onClick={onToggle}
     >
@@ -92,7 +129,7 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
             'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
             isSelected
               ? 'bg-primary border-primary'
-              : 'border-muted-foreground/30 group-hover:border-primary'
+              : 'border-muted-foreground/30'
           )}
         >
           {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
@@ -100,54 +137,16 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
       </div>
 
       {/* Info tooltip */}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Info className="w-4 h-4 text-muted-foreground" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="left" className="max-w-sm z-[250]">
-            <div className="space-y-2">
-              <p className="font-medium">{law.title}</p>
-              <p className="text-sm text-muted-foreground">{law.summary}</p>
-              <div className="flex flex-wrap gap-1">
-                {law.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Published: {format(new Date(law.publication_date), 'PPP')}
-              </p>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <div className="absolute top-3 right-3">
+        <InfoTooltip />
+      </div>
 
       <div className="mt-6 space-y-3">
-        {/* Jurisdiction badge */}
-        <Badge variant="outline" className={cn('text-xs', jurisdictionColors[law.jurisdiction])}>
-          {law.jurisdiction}
-        </Badge>
-
-        {/* Title */}
-        <div>
-          <button
-            onClick={handleTitleClick}
-            className="text-sm font-semibold hover:text-primary hover:underline text-left line-clamp-2"
-          >
-            {law.short_name}
-            <ExternalLink className="w-3 h-3 inline ml-1 opacity-50" />
-          </button>
-        </div>
-
-        {/* Category & Status */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Badges row */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <Badge variant="outline" className={cn('text-xs', jurisdictionColors[law.jurisdiction])}>
+            {law.jurisdiction}
+          </Badge>
           <Badge variant="secondary" className="text-xs">
             {law.category}
           </Badge>
@@ -156,20 +155,16 @@ export function LawCard({ law, isSelected, onToggle, viewMode }: LawCardProps) {
           </Badge>
         </div>
 
-        {/* Tags preview on hover */}
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="flex flex-wrap gap-1">
-            {law.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-            {law.tags.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{law.tags.length - 3}
-              </Badge>
-            )}
-          </div>
+        {/* Title */}
+        <div>
+          <button
+            onClick={handleTitleClick}
+            className="text-sm font-semibold hover:text-primary hover:underline text-left"
+          >
+            {law.title}
+            <ExternalLink className="w-3 h-3 inline ml-1 opacity-50" />
+          </button>
+          <p className="text-xs text-muted-foreground mt-1">{law.short_name}</p>
         </div>
       </div>
     </Card>

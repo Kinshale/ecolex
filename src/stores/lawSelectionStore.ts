@@ -15,6 +15,10 @@ interface LawSelectionState {
   clearSelection: () => void;
   isLawSelected: (lawId: string) => boolean;
   
+  // Uploaded document
+  uploadedDocument: File | null;
+  setUploadedDocument: (file: File | null) => void;
+  
   // Filters
   filters: LawFilters;
   setFilters: (filters: Partial<LawFilters>) => void;
@@ -60,6 +64,10 @@ export const useLawSelectionStore = create<LawSelectionState>((set, get) => ({
   clearSelection: () => set({ selectedLaws: [] }),
   isLawSelected: (lawId) => get().selectedLaws.some(l => l.id === lawId),
   
+  // Uploaded document
+  uploadedDocument: null,
+  setUploadedDocument: (file) => set({ uploadedDocument: file }),
+  
   // Filters
   filters: DEFAULT_LAW_FILTERS,
   setFilters: (newFilters) => set((state) => ({
@@ -68,7 +76,7 @@ export const useLawSelectionStore = create<LawSelectionState>((set, get) => ({
   resetFilters: () => set({ filters: DEFAULT_LAW_FILTERS }),
   
   // View mode
-  viewMode: 'grid',
+  viewMode: 'list',
   setViewMode: (mode) => set({ viewMode: mode }),
   
   // Session management
@@ -76,6 +84,7 @@ export const useLawSelectionStore = create<LawSelectionState>((set, get) => ({
   confirmSelection: () => set({ hasSelectedLawsForSession: true, isModalOpen: false }),
   resetSession: () => set({ 
     selectedLaws: [], 
+    uploadedDocument: null,
     hasSelectedLawsForSession: false,
     filters: DEFAULT_LAW_FILTERS,
   }),
