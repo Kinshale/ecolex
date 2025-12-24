@@ -140,7 +140,7 @@ When answering, always cite the specific law and article when applicable.`;
           </div>
           <h1 className="text-5xl font-bold">Environmental Law Assistant</h1>
           <p className="text-muted-foreground text-xl">
-            Select laws and upload documents to get context aware compliance insights (edit) (local edit).
+            Select laws and upload documents to get context aware compliance insights.
           </p>
         </div>
 
