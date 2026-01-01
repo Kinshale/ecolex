@@ -15,11 +15,6 @@ IMPORTANT GUIDELINES:
 5. Focus on practical compliance guidance for environmental engineering projects
 6. Cover areas including: sewage/wastewater, air quality, waste management, water resources, noise pollution, soil contamination, and energy/emissions
 
-When providing citations, structure them as:
-- For EU: "EU Directive [number/year], Article X"
-- For Italy: "D.Lgs. [number/year], Art. X" or "L. [number/year]"
-- For Lombardy: "L.R. Lombardia [number/year]" or "D.G.R. [number/year]"
-
 Be thorough but concise. Focus on actionable compliance information.`;
 
 serve(async (req) => {
@@ -28,42 +23,29 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, filters } = await req.json();
+    const { messages, systemContext, selectedLaws } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Build context based on filters
-    let filterContext = "";
-    if (filters?.regulatoryScopes?.length > 0) {
-      const scopeMap: Record<string, string> = {
-        european: "European Union directives and regulations",
-        national: "Italian national laws (D.Lgs., Leggi)",
-        lombardy: "Lombardy regional regulations (L.R., D.G.R.)"
-      };
-      const scopes = filters.regulatoryScopes.map((s: string) => scopeMap[s] || s).join(", ");
-      filterContext += `\nFocus your answers on: ${scopes}.`;
+    // Build enhanced system message with selected laws context
+    let systemMessage = SYSTEM_PROMPT;
+    
+    if (selectedLaws && selectedLaws.length > 0) {
+      const lawContext = selectedLaws.map((law: any) => 
+        `- ${law.short_name} (${law.title})\n  PDF: ${law.pdf_url}\n  Jurisdiction: ${law.jurisdiction} | Category: ${law.category}`
+      ).join('\n\n');
+      
+      systemMessage += `\n\n=== SELECTED LAWS FOR THIS CONVERSATION ===\nThe user has selected the following laws for reference. Use these as your primary sources:\n\n${lawContext}\n\nWhen answering questions, prioritize information from these selected laws and cite them specifically.`;
     }
     
-    if (filters?.areaOfInterest) {
-      const areaMap: Record<string, string> = {
-        sewage: "sewage and wastewater treatment",
-        air_quality: "air quality and emissions",
-        waste_management: "waste management and disposal",
-        water_resources: "water resources protection",
-        noise_pollution: "noise pollution control",
-        soil_contamination: "soil contamination and remediation",
-        energy: "energy efficiency and emissions",
-        general: "general environmental regulations"
-      };
-      filterContext += `\nSpecifically focus on regulations related to: ${areaMap[filters.areaOfInterest] || filters.areaOfInterest}.`;
+    if (systemContext) {
+      systemMessage += `\n\n${systemContext}`;
     }
 
-    const systemMessage = SYSTEM_PROMPT + filterContext;
-
-    console.log("Calling Lovable AI with filters:", filters);
+    console.log("Calling Lovable AI with", selectedLaws?.length || 0, "selected laws");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -101,13 +83,10 @@ serve(async (req) => {
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "I apologize, but I couldn't generate a response. Please try again.";
 
-    // Extract potential citations from the response
-    const citations = extractCitations(content);
-
     console.log("Chat response generated successfully");
 
     return new Response(
-      JSON.stringify({ content, citations }),
+      JSON.stringify({ content}),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
@@ -118,58 +97,3 @@ serve(async (req) => {
     );
   }
 });
-
-function extractCitations(content: string): Array<{
-  documentId: string;
-  documentTitle: string;
-  excerpt: string;
-  regulatoryScope: string;
-}> {
-  const citations: Array<{
-    documentId: string;
-    documentTitle: string;
-    excerpt: string;
-    regulatoryScope: string;
-  }> = [];
-
-  // Match EU directives
-  const euPattern = /EU\s+Directive\s+(\d+\/\d+(?:\/\w+)?)/gi;
-  let match;
-  while ((match = euPattern.exec(content)) !== null) {
-    citations.push({
-      documentId: `eu-${match[1].replace(/\//g, '-')}`,
-      documentTitle: `EU Directive ${match[1]}`,
-      excerpt: content.substring(Math.max(0, match.index - 50), Math.min(content.length, match.index + 100)),
-      regulatoryScope: 'european',
-    });
-  }
-
-  // Match Italian D.Lgs
-  const dlgsPattern = /D\.Lgs\.?\s*(?:n\.\s*)?(\d+\/\d+)/gi;
-  while ((match = dlgsPattern.exec(content)) !== null) {
-    citations.push({
-      documentId: `it-dlgs-${match[1].replace(/\//g, '-')}`,
-      documentTitle: `D.Lgs. ${match[1]}`,
-      excerpt: content.substring(Math.max(0, match.index - 50), Math.min(content.length, match.index + 100)),
-      regulatoryScope: 'national',
-    });
-  }
-
-  // Match Lombardy regional laws
-  const lrPattern = /L\.R\.?\s+(?:Lombardia\s+)?(?:n\.\s*)?(\d+\/\d+)/gi;
-  while ((match = lrPattern.exec(content)) !== null) {
-    citations.push({
-      documentId: `lr-lombardia-${match[1].replace(/\//g, '-')}`,
-      documentTitle: `L.R. Lombardia ${match[1]}`,
-      excerpt: content.substring(Math.max(0, match.index - 50), Math.min(content.length, match.index + 100)),
-      regulatoryScope: 'lombardy',
-    });
-  }
-
-  // Deduplicate by documentId
-  const uniqueCitations = citations.filter((citation, index, self) =>
-    index === self.findIndex(c => c.documentId === citation.documentId)
-  );
-
-  return uniqueCitations.slice(0, 5); // Limit to 5 citations
-}
