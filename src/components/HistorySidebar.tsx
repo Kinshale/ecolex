@@ -75,8 +75,8 @@ export function HistorySidebar() {
       {/* History */}
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="px-3 py-2">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            History
+          <span className="font-medium text-muted-foreground uppercase tracking-wider text-sm">
+            Chat History
           </span>
         </div>
 
