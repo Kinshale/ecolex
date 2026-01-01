@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Search, FileCheck, GraduationCap, MessageSquare, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Search, GraduationCap, MessageSquare, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 interface ChatSession {
   id: string;
@@ -27,7 +27,7 @@ export function HistorySidebar() {
   }, {
     id: '2',
     title: 'Air quality compliance',
-    type: 'analysis',
+    type: 'chat',
     createdAt: new Date(Date.now() - 86400000)
   }, {
     id: '3',
@@ -37,7 +37,7 @@ export function HistorySidebar() {
   }, {
     id: '4',
     title: 'Noise pollution check',
-    type: 'analysis',
+    type: 'chat',
     createdAt: new Date(Date.now() - 259200000)
   }]);
   if (!user) return null;
@@ -64,10 +64,6 @@ export function HistorySidebar() {
           <Search className="w-4 h-4" />
           <span className="text-sm">Explore Laws</span>
         </Button>
-        <Button variant="outline" className={cn("w-full justify-start gap-2 bg-sidebar-accent/50 border-sidebar-border hover:bg-sidebar-accent", location.pathname === '/document-analysis' && "bg-primary/10 border-primary/30")} onClick={() => navigate('/document-analysis')}>
-          <FileCheck className="w-4 h-4" />
-          <span className="text-sm">Check Your Document</span>
-        </Button>
         <Button variant="outline" className={cn("w-full justify-start gap-2 bg-sidebar-accent/50 border-sidebar-border hover:bg-sidebar-accent", location.pathname === '/polimi-hub' && "bg-primary/10 border-primary/30")} onClick={() => navigate('/polimi-hub')}>
           <GraduationCap className="w-4 h-4" />
           <span className="text-sm">Polimi Course Hub</span>
@@ -87,7 +83,7 @@ export function HistorySidebar() {
         <ScrollArea className="flex-1 px-3 pb-3">
           <div className="space-y-0.5">
             {sessions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).map(session => <Button key={session.id} variant="ghost" className="w-full justify-start gap-2 h-9 px-2 text-sm text-muted-foreground hover:text-sidebar-foreground">
-                  {session.type === 'chat' ? <MessageSquare className="w-4 h-4 shrink-0" /> : <FileCheck className="w-4 h-4 shrink-0" />}
+                  <MessageSquare className="w-4 h-4 shrink-0" />
                   <span className="truncate">{session.title}</span>
                 </Button>)}
           </div>

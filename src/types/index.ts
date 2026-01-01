@@ -57,28 +57,6 @@ export interface Document {
   createdAt: Date;
 }
 
-export interface ComplianceReport {
-  id: string;
-  documentName: string;
-  status: 'pass' | 'fail' | 'pending' | 'processing';
-  summary?: string;
-  violations: Violation[];
-  suggestions: Suggestion[];
-  createdAt: Date;
-}
-
-export interface Violation {
-  regulation: string;
-  description: string;
-  severity: 'low' | 'medium' | 'high';
-  location?: string;
-}
-
-export interface Suggestion {
-  title: string;
-  description: string;
-  regulation: string;
-}
 
 export const REGULATORY_SCOPE_LABELS: Record<RegulatoryScope, string> = {
   european: 'European Union',
