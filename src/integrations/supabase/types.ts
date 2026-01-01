@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      compliance_reports: {
+        Row: {
+          area_filter: Database["public"]["Enums"]["area_of_interest"] | null
+          created_at: string
+          document_name: string
+          id: string
+          regulatory_filters:
+            | Database["public"]["Enums"]["regulatory_scope"][]
+            | null
+          status: string
+          suggestions: Json | null
+          summary: string | null
+          user_id: string
+          violations: Json | null
+        }
+        Insert: {
+          area_filter?: Database["public"]["Enums"]["area_of_interest"] | null
+          created_at?: string
+          document_name: string
+          id?: string
+          regulatory_filters?:
+            | Database["public"]["Enums"]["regulatory_scope"][]
+            | null
+          status: string
+          suggestions?: Json | null
+          summary?: string | null
+          user_id: string
+          violations?: Json | null
+        }
+        Update: {
+          area_filter?: Database["public"]["Enums"]["area_of_interest"] | null
+          created_at?: string
+          document_name?: string
+          id?: string
+          regulatory_filters?:
+            | Database["public"]["Enums"]["regulatory_scope"][]
+            | null
+          status?: string
+          suggestions?: Json | null
+          summary?: string | null
+          user_id?: string
+          violations?: Json | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           area_filter: Database["public"]["Enums"]["area_of_interest"] | null

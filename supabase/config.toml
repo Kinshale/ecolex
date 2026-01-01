@@ -9,3 +9,6 @@ max_rows = 1000
 
 [functions.chat]
 verify_jwt = false
+
+[functions.polimi-chat]
+verify_jwt = false
