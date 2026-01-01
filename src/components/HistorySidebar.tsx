@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Search, GraduationCap, MessageSquare, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { GraduationCap, MessageSquare, PanelLeftClose, PanelLeft, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 interface ChatSession {
   id: string;
@@ -61,8 +61,8 @@ export function HistorySidebar() {
       {/* Activity Navigation */}
       <div className="px-3 pb-3 space-y-2">
         <Button variant="outline" className={cn("w-full justify-start gap-2 bg-sidebar-accent/50 border-sidebar-border hover:bg-sidebar-accent", location.pathname === '/law-chat' && "bg-primary/10 border-primary/30")} onClick={() => navigate('/law-chat')}>
-          <Search className="w-4 h-4" />
-          <span className="text-sm">Explore Laws</span>
+          <Plus className="w-4 h-4" />
+          <span className="text-sm">New Chat </span>
         </Button>
         <Button variant="outline" className={cn("w-full justify-start gap-2 bg-sidebar-accent/50 border-sidebar-border hover:bg-sidebar-accent", location.pathname === '/polimi-hub' && "bg-primary/10 border-primary/30")} onClick={() => navigate('/polimi-hub')}>
           <GraduationCap className="w-4 h-4" />
