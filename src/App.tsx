@@ -9,7 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import LawChat from "./pages/LawChat";
-import DocumentAnalysis from "./pages/DocumentAnalysis";
+
 import PolimiHub from "./pages/PolimiHub";
 import NotFound from "./pages/NotFound";
 
@@ -28,7 +28,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/law-chat" element={<LawChat />} />
-              <Route path="/document-analysis" element={<DocumentAnalysis />} />
+              
               <Route path="/polimi-hub" element={<PolimiHub />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
