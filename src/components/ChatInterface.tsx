@@ -10,6 +10,7 @@ import { Send, Bot, User, FileText, Loader2, Scale, Upload, FileCheck, X, Plus, 
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import ReactMarkdown from 'react-markdown';
 import { useLawSelectionStore } from '@/stores/lawSelectionStore';
 interface ChatInterfaceProps {
   conversationId?: string;
@@ -193,9 +194,9 @@ function MessageBubble({
 
       <div className={cn('flex-1 space-y-2', isUser && 'text-right')}>
         <Card className={cn('inline-block p-4 max-w-[85%] border-0', isUser ? 'bg-primary text-primary-foreground' : 'bg-muted/50')}>
-          <p className="whitespace-pre-wrap text-sm leading-relaxed">
-            {message.content}
-          </p>
+          <div className="prose prose-sm dark:prose-invert max-w-none leading-relaxed">
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          </div>
         </Card>
 
         {/* Citations */}
