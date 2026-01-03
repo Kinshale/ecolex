@@ -61,6 +61,7 @@ export default function PolimiHub() {
   const [selectedDegreeId, setSelectedDegreeId] = useState<string>('ambiente-territorio');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [fileContents, setFileContents] = useState<string>('');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const selectedDegree = DEGREES.find(d => d.id === selectedDegreeId);
 
@@ -102,7 +103,12 @@ export default function PolimiHub() {
       <Header />
       
       <div className="flex-1 flex overflow-hidden">
-        <HistorySidebar />
+        <HistorySidebar
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          activeConversationId={null}
+          onConversationSelect={() => {}}
+        />
         
         <div className="flex-1 flex overflow-hidden">
           <PolimiSidebar
