@@ -9,11 +9,11 @@ import { Bot, User, FileText, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import ReactMarkdown from 'react-markdown';
 import { useLawSelectionStore } from '@/stores/lawSelectionStore';
 import { useChatMessages } from '@/hooks/useChatMessages';
 import { useConversations } from '@/hooks/useConversations';
 import { useAuth } from '@/lib/auth';
+import ReactMarkdown from 'react-markdown';
 
 interface ChatInterfaceProps {
   conversationId: string | null;
@@ -266,8 +266,10 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             isUser ? 'bg-primary text-primary-foreground' : 'bg-muted/50'
           )}
         >
-          <div className="prose prose-sm dark:prose-invert max-w-none leading-relaxed">
-            <ReactMarkdown>{message.content}</ReactMarkdown>
+          <div className="whitespace-pre-wrap text-sm leading-relaxed">
+            <ReactMarkdown>
+              {message.content}
+            </ReactMarkdown>
           </div>
         </Card>
 

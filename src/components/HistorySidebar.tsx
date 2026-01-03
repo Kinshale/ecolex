@@ -57,10 +57,15 @@ export function HistorySidebar({
   const handleRenameSubmit = async () => {
     if (!selectedConversation || !newTitle.trim()) return;
     
-    await updateConversationTitle(selectedConversation.id, newTitle.trim());
+    const success = await updateConversationTitle(selectedConversation.id, newTitle.trim());
     setRenameDialogOpen(false);
     setSelectedConversation(null);
-    toast({ title: 'Chat renamed' });
+    
+    if (success) {
+      toast({ title: 'Chat renamed' });
+    } else {
+      toast({ title: 'Failed to rename chat', variant: 'destructive' });
+    }
   };
 
   const handleDelete = async (conversation: Conversation) => {
@@ -149,14 +154,14 @@ export function HistorySidebar({
                   <div
                     key={conversation.id}
                     className={cn(
-                      'group flex items-center gap-1 rounded-md hover:bg-sidebar-accent',
+                      'group flex items-center gap-1 rounded-md hover:bg-sidebar-accent min-w-0',
                       activeConversationId === conversation.id && 'bg-primary/10'
                     )}
                   >
                     <Button
                       variant="ghost"
                       className={cn(
-                        'flex-1 justify-start gap-2 h-9 px-2 text-sm text-muted-foreground hover:text-sidebar-foreground hover:bg-transparent',
+                        'flex-1 justify-start gap-2 h-9 px-2 text-sm text-muted-foreground hover:text-sidebar-foreground hover:bg-transparent min-w-0 text-left',
                         activeConversationId === conversation.id && 'text-sidebar-foreground'
                       )}
                       onClick={() => {
@@ -164,8 +169,7 @@ export function HistorySidebar({
                         onConversationSelect(conversation.id);
                       }}
                     >
-                      <MessageSquare className="w-4 h-4 shrink-0" />
-                      <span className="truncate">{conversation.title || 'New Chat'}</span>
+                      <span className="truncate block min-w-0 flex-1 text-left">{conversation.title || 'New Chat'}</span>
                     </Button>
                     
                     <DropdownMenu>
@@ -173,7 +177,7 @@ export function HistorySidebar({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>

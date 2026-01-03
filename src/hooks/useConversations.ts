@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 
@@ -14,27 +14,33 @@ export function useConversations() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchConversations = useCallback(async () => {
     if (!user) {
       setConversations([]);
       setIsLoading(false);
       return;
     }
 
-    const fetchConversations = async () => {
-      const { data, error } = await supabase
-        .from('conversations')
-        .select('id, title, created_at, updated_at')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('id, title, created_at, updated_at')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching conversations:', error);
-      } else {
-        setConversations(data || []);
-      }
+    if (error) {
+      console.error('Error fetching conversations:', error);
+    } else {
+      setConversations(data || []);
+    }
+    setIsLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setConversations([]);
       setIsLoading(false);
-    };
+      return;
+    }
 
     fetchConversations();
 
@@ -58,7 +64,7 @@ export function useConversations() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, fetchConversations]);
 
   const createConversation = async (title: string = 'New Chat') => {
     if (!user) return null;
@@ -85,7 +91,12 @@ export function useConversations() {
 
     if (error) {
       console.error('Error updating conversation:', error);
+      return false;
     }
+    
+    // Manually refetch to update the UI immediately
+    await fetchConversations();
+    return true;
   };
 
   const deleteConversation = async (id: string) => {
@@ -111,6 +122,8 @@ export function useConversations() {
       return false;
     }
 
+    // Manually refetch to update the UI immediately
+    await fetchConversations();
     return true;
   };
 
