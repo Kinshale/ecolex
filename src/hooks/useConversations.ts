@@ -88,10 +88,37 @@ export function useConversations() {
     }
   };
 
+  const deleteConversation = async (id: string) => {
+    // First delete all messages in the conversation
+    const { error: messagesError } = await supabase
+      .from('messages')
+      .delete()
+      .eq('conversation_id', id);
+
+    if (messagesError) {
+      console.error('Error deleting messages:', messagesError);
+      return false;
+    }
+
+    // Then delete the conversation
+    const { error } = await supabase
+      .from('conversations')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting conversation:', error);
+      return false;
+    }
+
+    return true;
+  };
+
   return {
     conversations,
     isLoading,
     createConversation,
     updateConversationTitle,
+    deleteConversation,
   };
 }

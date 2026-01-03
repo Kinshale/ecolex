@@ -34,7 +34,8 @@ export function ChatInterface({ conversationId, onConversationChange }: ChatInte
 
   // Use DB messages if we have a conversation, otherwise use local messages
   const messages = conversationId ? dbMessages : localMessages;
-  const hasStartedChat = messages.length > 0;
+  // Consider chat started if we have a conversation ID (even if still loading)
+  const hasStartedChat = messages.length > 0 || (conversationId !== null && isLoadingMessages);
 
   useEffect(() => {
     if (scrollRef.current) {
