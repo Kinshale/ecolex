@@ -50,48 +50,6 @@ export type Database = {
         }
         Relationships: []
       }
-      documents: {
-        Row: {
-          area_of_interest: Database["public"]["Enums"]["area_of_interest"]
-          content_summary: string | null
-          created_at: string
-          file_name: string
-          file_path: string | null
-          id: string
-          is_processed: boolean | null
-          regulatory_scope: Database["public"]["Enums"]["regulatory_scope"]
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          area_of_interest?: Database["public"]["Enums"]["area_of_interest"]
-          content_summary?: string | null
-          created_at?: string
-          file_name: string
-          file_path?: string | null
-          id?: string
-          is_processed?: boolean | null
-          regulatory_scope: Database["public"]["Enums"]["regulatory_scope"]
-          title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          area_of_interest?: Database["public"]["Enums"]["area_of_interest"]
-          content_summary?: string | null
-          created_at?: string
-          file_name?: string
-          file_path?: string | null
-          id?: string
-          is_processed?: boolean | null
-          regulatory_scope?: Database["public"]["Enums"]["regulatory_scope"]
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       messages: {
         Row: {
           citations: Json | null
